@@ -1,7 +1,7 @@
 %global debug_package %{nil}
 
 Name:           nabu-fedora-configs-gnome
-Version:        0.3
+Version:        0.4
 Release:        1%{?dist}
 Summary:        Configurations for Fedora for Nabu Gnome builds
 License:        MIT
@@ -21,13 +21,27 @@ This package contains configurations specific for Fedora for Nabu builds with Gn
 %install
 cp -a var %{buildroot}/
 cp -a etc %{buildroot}/
+cp -a usr %{buildroot}/
 
 %files
 %attr(644, gdm, gdm) %config(noreplace) %{_sharedstatedir}/gdm/.config/monitors.xml
 %attr(644, root, root) %config(noreplace) %{_sysconfdir}/locale.conf
 %attr(644, root, root) %config(noreplace) %{_sysconfdir}/environment.d/99-im.conf
+%attr(644, root, root) %{_prefix}/lib/systemd/system/fcitx5-autostart.service
+
+%post
+%systemd_post fcitx5-autostart.service
+
+%preun
+%systemd_preun fcitx5-autostart.service
+
+%postun
+%systemd_postun_with_restart fcitx5-autostart.service
 
 %changelog
+* Fri Oct 10 2025 jhuang6451 <xplayerhtz123@outlook.com> - 0.4-1
+- Add fcitx5 autostart service.
+
 * Sat Oct 04 2025 jhuang6451 <xplayerhtz123@outlook.com> - 0.3-1
 - Fix error.
 

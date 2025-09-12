@@ -3,7 +3,7 @@
 Version:         6.16.0
 Release:         0.sm8150%{?dist}
 ExclusiveArch:   aarch64
-Name:            kernel
+Name:            kernel-sm8150
 Summary:         linux-sm8150 kernel
 License:         GPLv2
 URL:             https://gitlab.com/sm8150-mainline/linux
@@ -22,7 +22,7 @@ Provides:        kernel-modules-core  = %{version}-%{release}
 %global uname_r %{version}-%{release}.%{_target_cpu}
 
 %description
-Mainline kernel for sm8150 (qcom snapdragon 855/860) devices.
+Mainline kernel for sm8150 (qcom snapdragon 855/860) devices, additionally supports UEFI boot.
 
 %prep
 %autosetup -n linux-sm8150-%{tag}
@@ -35,7 +35,7 @@ cat %{SOURCE1} >> .config
 rm -f localversion*
 
 make olddefconfig
-make EXTRAVERSION="-%{release}.%{_target_cpu}" LOCALVERSION= -j%{?_smp_build_ncpus} Image.gz modules dtbs
+make EXTRAVERSION="-%{release}.%{_target_cpu}" LOCALVERSION= -j%{?_smp_build_ncpus} Image modules dtbs
 
 %install
 make EXTRAVERSION="-%{release}.%{_target_cpu}" LOCALVERSION= \
@@ -79,11 +79,19 @@ ln -sf "../modules/${uname_r}/initramfs.img" "/usr/lib/ostree-boot/initramfs-${u
 
 kernel-install add "${uname_r}" "/usr/lib/modules/${uname_r}/vmlinuz" "/usr/lib/modules/${uname_r}/initramfs.img"
 
+# UEFI boot
+install -d /boot/efi/fedora
+install -Dm644 "/usr/lib/modules/${uname_r}/vmlinuz" "/boot/efi/fedora/Image"
+install -Dm644 "/usr/lib/modules/${uname_r}/dtb/qcom/sm8150-xiaomi-nabu.dtb" "/boot/efi/fedora/sm8150-xiaomi-nabu.dtb"
+
 %postun
 if [ "$1" -eq 0 ] ; then
     kernel-install remove %{uname_r}
 fi
 
 %changelog
+* Fri Sep 12 2025 jhuang6451 <xplayerhtz123@outlook.com> - 6.16.0-0.sm8150
+- Added post-transaction script to copy kernel and DTB to ESP for UEFI boot.
+
 * Fri Jul 25 2025 gmanka 6.16.0
 - update to 6.16.0

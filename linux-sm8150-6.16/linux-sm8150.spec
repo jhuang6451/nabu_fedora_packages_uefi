@@ -47,8 +47,8 @@ make EXTRAVERSION="-%{release}.%{_target_cpu}" LOCALVERSION= -j%{?_smp_build_ncp
 # 1. 安装内核模块
 # INSTALL_MOD_PATH 指向 %{buildroot}/usr，这会将模块安装到 %{buildroot}/usr/lib/modules/%{uname_r}/
 make EXTRAVERSION="-%{release}.%{_target_cpu}" LOCALVERSION= \
-     INSTALL_MOD_PATH=%{buildroot}/usr \
-     modules_install
+    INSTALL_MOD_PATH=%{buildroot}/usr \
+    modules_install
 
 # 2. 安装内核镜像、System.map 和配置文件到 /boot 目录
 # 这是标准 Fedora 的做法，文件会带有版本号后缀
@@ -70,29 +70,40 @@ install -Dm644 arch/arm64/boot/dts/qcom/sm8150-xiaomi-nabu.dtb %{buildroot}/usr/
 
 
 %posttrans
+# ==============================================================================
+# --- MODIFIED SECTION ---
+# This script runs after the package's files are installed.
+# We rely entirely on the kernel-install framework to handle boot updates.
+# ==============================================================================
 set -e
 uname_r=%{uname_r}
 
 # 1. 为新内核生成模块依赖
+# 虽然 kernel-install 的插件可能会处理这个，但显式调用更安全。
 depmod -a "${uname_r}"
 
-# 2. 使用 dracut 生成 initramfs，并直接放置在 /boot 目录下
-dracut -v --force "/boot/initramfs-${uname_r}.img" "${uname_r}"
-
-# 3. 使用 kernel-install 工具添加新内核
-# 这是在现代 Fedora 系统上管理内核安装的推荐方法。
-# 它会自动处理引导加载程序的配置（如 systemd-boot 或 grub2），
-# 并将需要的文件（内核、initramfs、DTB）复制到 ESP 分区（/boot/efi）中（如果引导加载程序需要）。
+# 2. 【关键修改】使用 kernel-install 工具添加新内核。
+# 我们移除了手动的 `dracut` 调用，因为 kernel-install 会根据系统配置
+# (/etc/kernel/install.conf 和 /etc/dracut.conf.d/) 自动调用 dracut
+# 来生成正确的启动产物（在这个场景下是 UKI）。
+# 这确保了内核升级过程与初始镜像创建过程的行为一致。
+echo "Running kernel-install to add kernel ${uname_r}..."
 kernel-install add "${uname_r}" "/boot/vmlinuz-${uname_r}"
+
 
 %postun
 # 这个脚本在卸载包时运行
 if [ "$1" -eq 0 ] ; then
     # 使用 kernel-install 移除此内核的引导项，保持系统清洁
+    echo "Running kernel-install to remove kernel %{uname_r}..."
     kernel-install remove %{uname_r}
 fi
 
 %changelog
+* Sat Sep 20 2025 jhuang6451 <xplayerhtz123@outlook.com> - 6.16.0-2.sm8150
+- Aligned post-install script with kernel-install framework for consistent UKI generation.
+- Removed redundant dracut call from %posttrans.
+
 * Sat Sep 13 2025 jhuang6451 <xplayerhtz123@outlook.com> - 6.16.0-1.sm8150
 - Modified spec for standard Fedora systems, removing ostree logic.
 - Adopted standard file paths (/boot) and kernel-install for UEFI/bootloader integration.

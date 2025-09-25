@@ -113,7 +113,7 @@ echo "Generating UKI with systemd-ukify..."
 # ukify 会从 /etc/systemd/ukify.conf 读取静态配置 (Cmdline, Stub)
 # 我们为确保健壮性，直接提供版本相关的路径。
 ukify build \
-    --kernel="${KERNEL_PATH}" \
+    --linux="${KERNEL_PATH}" \
     --initrd="${INITRD_PATH}" \
     --devicetree="${DTB_PATH}" \
     --output="${UKI_PATH}"

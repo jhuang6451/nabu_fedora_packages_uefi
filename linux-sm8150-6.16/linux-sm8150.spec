@@ -1,7 +1,7 @@
 %undefine        _debugsource_packages
 %global tag      6.16
 Version:         6.16.0
-Release:         1.sm8150%{?dist}
+Release:         3.sm8150%{?dist}
 ExclusiveArch:   aarch64
 Name:            kernel-sm8150
 Summary:         The Linux kernel for sm8150 devices
@@ -82,13 +82,21 @@ uname_r=%{uname_r}
 # 虽然 kernel-install 的插件可能会处理这个，但显式调用更安全。
 depmod -a "${uname_r}"
 
-# 2. 【关键修改】使用 kernel-install 工具添加新内核。
-# 我们移除了手动的 `dracut` 调用，因为 kernel-install 会根据系统配置
-# (/etc/kernel/install.conf 和 /etc/dracut.conf.d/) 自动调用 dracut
-# 来生成正确的启动产物（在这个场景下是 UKI）。
-# 这确保了内核升级过程与初始镜像创建过程的行为一致。
-echo "Running kernel-install to add kernel ${uname_r}..."
-kernel-install add "${uname_r}" "/boot/vmlinuz-${uname_r}"
+# 2. 【关键修改】直接调用 dracut 生成 UKI，绕过 kernel-install
+# 这确保了无论是初始安装还是未来更新，DTB 都能被正确包含。
+echo "Directly calling dracut to generate UKI for kernel ${uname_r}..."
+UKI_DIR="/boot/efi/EFI/Linux"
+# 尝试使用 machine-id 命名，如果失败则使用备用名
+MACHINE_ID=$(cat /etc/machine-id 2>/dev/null)
+if [ -n "$MACHINE_ID" ]; then
+    UKI_PATH="${UKI_DIR}/${MACHINE_ID}-${uname_r}.efi"
+else
+    UKI_PATH="${UKI_DIR}/fedora-${uname_r}.efi"
+fi
+mkdir -p "$UKI_DIR"
+dracut --kver "${uname_r}" --force --uefi --uefi-outfile="$UKI_PATH"
+echo "UKI generated at ${UKI_PATH}"
+
 
 
 %postun
@@ -100,6 +108,11 @@ if [ "$1" -eq 0 ] ; then
 fi
 
 %changelog
+* Thu Sep 25 2025 jhuang6451 <xplayerhtz123@outlook.com> - 6.16.0-3.sm8150
+- Replaced `kernel-install` with a direct `dracut` call in %posttrans scriptlet.
+- This fixes a critical bug where the device tree (DTB) was not being
+  included in the generated UKI, ensuring the kernel is bootable.
+
 * Sat Sep 20 2025 jhuang6451 <xplayerhtz123@outlook.com> - 6.16.0-2.sm8150
 - Aligned post-install script with kernel-install framework for consistent UKI generation.
 - Removed redundant dracut call from %posttrans.

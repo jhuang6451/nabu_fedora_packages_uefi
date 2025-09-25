@@ -1,7 +1,7 @@
 %undefine        _debugsource_packages
 %global tag      6.16
 Version:         6.16.0
-Release:         3.sm8150%{?dist}
+Release:         4.sm8150%{?dist}
 ExclusiveArch:   aarch64
 Name:            kernel-sm8150
 Summary:         The Linux kernel for sm8150 devices
@@ -71,22 +71,25 @@ install -Dm644 arch/arm64/boot/dts/qcom/sm8150-xiaomi-nabu.dtb %{buildroot}/usr/
 
 %posttrans
 # ==============================================================================
-# --- MODIFIED SECTION ---
 # This script runs after the package's files are installed.
-# We rely entirely on the kernel-install framework to handle boot updates.
+# It drives the UKI generation process. Static config is read from files,
+# while version-specific paths are passed as arguments for robustness.
 # ==============================================================================
 set -e
 uname_r=%{uname_r}
 
-# 1. 为新内核生成模块依赖
-# 虽然 kernel-install 的插件可能会处理这个，但显式调用更安全。
+# --- 为新内核生成模块依赖 ---
 depmod -a "${uname_r}"
 
-# 2. 【关键修改】直接调用 dracut 生成 UKI，绕过 kernel-install
-# 这确保了无论是初始安装还是未来更新，DTB 都能被正确包含。
-echo "Directly calling dracut to generate UKI for kernel ${uname_r}..."
+echo "--- Generating UKI for ${uname_r} using dracut + ukify ---"
+
+# --- 定义路径 ---
 UKI_DIR="/boot/efi/EFI/Linux"
-# 尝试使用 machine-id 命名，如果失败则使用备用名
+INITRD_PATH="/boot/initramfs-${uname_r}.img"
+KERNEL_PATH="/boot/vmlinuz-${uname_r}"
+DTB_PATH="/usr/lib/modules/${uname_r}/dtb/qcom/sm8150-xiaomi-nabu.dtb"
+
+# --- 确定输出路径 ---
 MACHINE_ID=$(cat /etc/machine-id 2>/dev/null)
 if [ -n "$MACHINE_ID" ]; then
     UKI_PATH="${UKI_DIR}/${MACHINE_ID}-${uname_r}.efi"
@@ -94,8 +97,40 @@ else
     UKI_PATH="${UKI_DIR}/fedora-${uname_r}.efi"
 fi
 mkdir -p "$UKI_DIR"
-dracut --kver "${uname_r}" --force --uefi --uefi-outfile="$UKI_PATH"
-echo "UKI generated at ${UKI_PATH}"
+
+# --- 步骤 1: 使用 dracut 生成 initramfs ---
+echo "Generating initramfs with dracut..."
+# dracut 会从 /etc/dracut.conf.d/ 读取配置
+dracut --kver "${uname_r}" --force
+if [ ! -f "${INITRD_PATH}" ]; then
+    echo "CRITICAL: dracut failed to generate initramfs at ${INITRD_PATH}" >&2
+    exit 1
+fi
+echo "Initramfs generated at ${INITRD_PATH}"
+
+# --- 步骤 2: 使用 systemd-ukify 生成 UKI ---
+echo "Generating UKI with systemd-ukify..."
+# ukify 会从 /etc/systemd/ukify.conf 读取静态配置 (Cmdline, Stub)
+# 我们为确保健壮性，直接提供版本相关的路径。
+ukify build \
+    --kernel="${KERNEL_PATH}" \
+    --initrd="${INITRD_PATH}" \
+    --devicetree="${DTB_PATH}" \
+    --output="${UKI_PATH}"
+
+if [ ! -f "${UKI_PATH}" ]; then
+    echo "CRITICAL: ukify failed to generate UKI at ${UKI_PATH}" >&2
+    # 清理失败的中间产物
+    rm -f "${INITRD_PATH}"
+    exit 1
+fi
+echo "SUCCESS: UKI generated at ${UKI_PATH}"
+
+# --- 步骤 3: 清理独立的 initramfs ---
+echo "Cleaning up standalone initramfs..."
+rm -f "${INITRD_PATH}"
+
+echo "--- UKI generation complete for ${uname_r} ---"
 
 
 
@@ -108,6 +143,11 @@ if [ "$1" -eq 0 ] ; then
 fi
 
 %changelog
+* Thu Sep 25 2025 jhuang6451 <xplayerhtz123@outlook.com> - 6.16.0-4.sm8150
+- Switched UKI generation to a dracut + systemd-ukify two-step process.
+- dracut is now only responsible for creating the initramfs.
+- systemd-ukify is used to assemble the kernel, initramfs, cmdline, and DTB into the final UKI.
+
 * Thu Sep 25 2025 jhuang6451 <xplayerhtz123@outlook.com> - 6.16.0-3.sm8150
 - Replaced `kernel-install` with a direct `dracut` call in %posttrans scriptlet.
 - This fixes a critical bug where the device tree (DTB) was not being

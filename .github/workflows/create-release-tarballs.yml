@@ -1,0 +1,58 @@
+# .github/workflows/create-release.yml
+
+name: Create Release and Package Sources
+
+on:
+  push:
+    tags:
+      - 'v*'
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  build-and-release:
+    name: Build and Release
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Check out code
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Extract version from tag
+        id: get_version
+        run: echo "VERSION=$(echo ${GITHUB_REF_NAME} | sed 's/^v//')" >> $GITHUB_ENV
+
+      - name: Read package list from file
+        id: set_packages
+        run: |
+          # Read file content, filter out empty lines, and convert newlines to spaces
+          PACKAGES_LIST=$(cat release-tarballs.txt | grep -v '^$' | tr '\n' ' ')
+          echo "PACKAGES=${PACKAGES_LIST}" >> $GITHUB_ENV
+
+      - name: Create release assets directory
+        run: mkdir -p release_assets
+
+      - name: Create source tarballs
+        run: |
+          for pkg in ${{ env.PACKAGES }};
+          do
+            if [ -d "$pkg" ]; then
+              echo "Packaging ${pkg}..."
+              tarball_name="${pkg}-${{ env.VERSION }}.tar.gz"
+              git archive --format=tar.gz --prefix="${pkg}-${{ env.VERSION }}/" -o "release_assets/${tarball_name}" HEAD "${pkg}/"
+              echo " -> Created release_assets/${tarball_name}"
+            else
+              echo "Warning: Directory ${pkg} not found, skipping."
+            fi
+          done
+
+      - name: Create GitHub Release and upload assets
+        uses: softprops/action-gh-release@v2
+        with:
+          name: "Release ${{ github.ref_name }}"
+          generate_release_notes: true
+          files: release_assets/*.tar.gz

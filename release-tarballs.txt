@@ -1,0 +1,2 @@
+nabu-fedora-configs-core
+nabu-fedora-configs-extra

@@ -1,13 +1,13 @@
 %global debug_package %{nil}
 
 Name:           nabu-fedora-configs-branding
-Version:        0.5
+Version:        0.6
 Release:        1%{?dist}
 Summary:        Custom branding info for Nabu for Fedora.
 License:        MIT
 URL:            https://github.com/jhuang6451/nabu-fedora
 Source0:        https://github.com/jhuang6451/nabu_fedora_packages/releases/download/v%{version}/%{name}-%{version}.tar.gz
-BuildArch:      aarch64
+BuildArch:      noarch
 Requires:       fedora-release-common
 Requires:       fedora-repos
 

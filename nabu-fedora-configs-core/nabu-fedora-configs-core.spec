@@ -1,13 +1,13 @@
 %global debug_package %{nil}
 
 Name:           nabu-fedora-configs-core
-Version:        0.5
+Version:        0.6
 Release:        1%{?dist}
 Summary:        Core configuration files for Fedora on Xiaomi Pad 5 (nabu)
 License:        MIT
 URL:            https://github.com/jhuang6451/nabu-fedora
 Source0:        https://github.com/jhuang6451/nabu_fedora_packages/releases/download/v%{version}/%{name}-%{version}.tar.gz
-BuildArch:      aarch64
+BuildArch:      noarch
 BuildRequires:  systemd-rpm-macros
 Requires:       dracut
 Requires:       systemd-ukify

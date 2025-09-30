@@ -43,7 +43,9 @@ jobs:
             if [ -d "$pkg" ]; then
               echo "Packaging ${pkg}..."
               tarball_name="${pkg}-${{ env.VERSION }}.tar.gz"
-              git archive --format=tar.gz --prefix="${pkg}-${{ env.VERSION }}/" -o "release_assets/${tarball_name}" HEAD "${pkg}/"
+              # Change directory into the package folder to archive its contents, not the folder itself.
+              # This prevents a nested directory structure in the tarball.
+              (cd "${pkg}" && git archive --format=tar.gz --prefix="${pkg}-${{ env.VERSION }}/" -o "${OLDPWD}/release_assets/${tarball_name}" HEAD .)
               echo " -> Created release_assets/${tarball_name}"
             else
               echo "Warning: Directory ${pkg} not found, skipping."

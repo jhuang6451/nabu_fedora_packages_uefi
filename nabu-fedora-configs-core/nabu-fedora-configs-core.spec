@@ -12,7 +12,7 @@ Source0:        https://github.com/jhuang6451/nabu_fedora_packages/releases/down
 BuildArch:      noarch
 
 %description
-This package contains the essential configuration files for running Fedora on the Xiaomi Pad 5 (nabu).
+This package contains the essential configuration files for running Fedora on the Xiaomi Pad 5 (nabu)
 
 %prep
 %autosetup
@@ -33,5 +33,5 @@ cp -a etc %{buildroot}/
 %config(noreplace) %{_sysconfdir}/udev/rules.d/99-force-rtc1.rules
 
 %changelog
-* Tue Sep 30 2025 Your Name <your-email@example.com> - 0.1-1
+* Tue Sep 30 2025 jhuang6451 <xplayerhtz123@outlook.com> - 0.1-1
 - Initial release, switched to clean source tarballs

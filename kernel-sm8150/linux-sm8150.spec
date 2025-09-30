@@ -4,7 +4,7 @@ Version:         6.16.0
 Release:         4.sm8150%{?dist}
 ExclusiveArch:   aarch64
 Name:            kernel-sm8150
-Summary:         Mainline Linux kernel for sm8150 devices.
+Summary:         Mainline Linux kernel for sm8150 devices
 License:         GPLv2
 URL:             https://gitlab.com/sm8150-mainline/linux
 Source0:         %{url}/-/archive/sm8150/%{tag}/linux-sm8150-%{tag}.tar.gz
@@ -21,7 +21,7 @@ Provides:        kernel-modules-core  = %{version}-%{release}
 %global uname_r %{version}-%{release}.%{_target_cpu}
 
 %description
-Mainline kernel for sm8150 (Qualcomm Snapdragon 855/860) devices, packaged for standard Fedora systems with UEFI boot support.
+Mainline kernel for sm8150 (Qualcomm Snapdragon 855/860) devices, packaged for standard Fedora systems with UEFI boot support
 
 %prep
 %autosetup -n linux-sm8150-%{tag}

@@ -12,7 +12,7 @@ Source0:        https://github.com/jhuang6451/nabu_fedora_packages/releases/down
 BuildArch:      noarch
 
 %description
-This package contains extra configuration files for running Fedora on the Xiaomi Pad 5 (nabu), such as display, input method, and performance tweaks.
+This package contains extra configuration files for running Fedora on the Xiaomi Pad 5 (nabu), such as display, input method, and performance tweaks
 
 %prep
 %autosetup
@@ -34,5 +34,5 @@ cp -a var %{buildroot}/
 %config(noreplace) %{_sharedstatedir}/gdm/.config/monitors.xml
 
 %changelog
-* Tue Sep 30 2025 Your Name <your-email@example.com> - 0.1-1
+* Tue Sep 30 2025 jhuang6451 <xplayerhtz123@outlook.com> - 0.1-1
 - Initial release

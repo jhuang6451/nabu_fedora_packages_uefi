@@ -1,7 +1,7 @@
 Name:           xiaomi-nabu-firmware
 Version:        1
 Release:        1%{?dist}
-Summary:        Firmware for mipad5.
+Summary:        Firmware for mipad5
 License:        Unknown
 URL:            https://gitlab.postmarketos.org/panpanpanpan/nabu-firmware
 Source0:        %{url}/-/archive/%{version}/nabu-firmware-%{version}.tar.gz
@@ -11,7 +11,7 @@ Requires:       qcom-firmware
 %global _firmwaredir %{_prefix}/lib/firmware
 
 %description
-Firmware for mipad5.
+Firmware for mipad5
 
 %prep
 %autosetup -n nabu-firmware-%{version}

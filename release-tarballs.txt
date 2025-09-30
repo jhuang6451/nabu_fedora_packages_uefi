@@ -1,3 +1,4 @@
 nabu-fedora-configs-core
 nabu-fedora-configs-extra
 nabu-fedora-configs-branding
+nabu-fedora-dualboot-efi

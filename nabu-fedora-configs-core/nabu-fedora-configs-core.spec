@@ -8,6 +8,7 @@ License:        MIT
 URL:            https://github.com/jhuang6451/nabu-fedora
 Source0:        https://github.com/jhuang6451/nabu_fedora_packages/releases/download/v%{version}/%{name}-%{version}.tar.gz
 BuildArch:      noarch
+BuildRequires:  systemd-rpm-macros
 Requires:       dracut
 Requires:       systemd-ukify
 Requires:       rmtfs
@@ -30,11 +31,8 @@ cp -a etc %{buildroot}/
 %files
 %config(noreplace) %{_sysconfdir}/dracut.conf.d/99-nabu-generic.conf
 %config(noreplace) %{_sysconfdir}/fstab
-%config(noreplace) %{_sysconfdir}/os-release
 %config(noreplace) %{_sysconfdir}/systemd/ukify.conf
-%{_unitdir}/ath10k-shutdown.service
-%{_unitdir}/rmtfs.service
-%{_unitdir}/tqftpserv.service
+%config(noreplace) %{_sysconfdir}/systemd/system/ath10k-shutdown.service
 %config(noreplace) %{_sysconfdir}/udev/rules.d/99-force-rtc1.rules
 
 %post

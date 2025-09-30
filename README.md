@@ -9,7 +9,7 @@ These packages are intended to be built in a [COPR](https://copr.fedorainfraclou
 The following packages are managed in this repository:
 
 - `kernel-sm8150`: The Linux kernel compiled for the SM8150 platform.
-- `nabu-fedora-configs-basic`: Core system configuration files.
+- `nabu-fedora-configs-core`: Core system configuration files.
 - `nabu-fedora-configs-efi`: EFI bootloader configurations.
 - `nabu-fedora-configs-extra`: Additional configurations for display, input methods, and performance tweaks.
 - `xiaomi-nabu-audio`: Audio configuration files (PulseAudio and ALSA).
@@ -20,7 +20,7 @@ The following packages are managed in this repository:
 This repository uses a fully automated release process powered by GitHub Actions. This process simplifies releases and ensures that COPR has access to clean, versioned source code for each package.
 
 The following packages are managed by this process:
-- `nabu-fedora-configs-basic`
+- `nabu-fedora-configs-core`
 - `nabu-fedora-configs-efi`
 - `nabu-fedora-configs-extra`
 

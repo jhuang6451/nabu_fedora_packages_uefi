@@ -21,6 +21,7 @@ The following packages are managed in this repository:
 This repository uses a fully automated release process powered by GitHub Actions. This process simplifies releases and ensures that COPR has access to clean, versioned source code for each package.
 
 The following packages are now managed by this process:
+
 - `nabu-fedora-configs-core`
 - `nabu-fedora-configs-efi`
 - `nabu-fedora-configs-extra`

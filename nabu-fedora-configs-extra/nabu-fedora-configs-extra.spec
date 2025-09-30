@@ -8,6 +8,7 @@ License:        MIT
 URL:            https://github.com/jhuang6451/nabu-fedora
 Source0:        https://github.com/jhuang6451/nabu_fedora_packages/releases/download/v%{version}/%{name}-%{version}.tar.gz
 BuildArch:      noarch
+BuildRequires:  systemd-rpm-macros
 Requires:       fcitx5
 Requires:       qbootctl
 Requires:       zram-generator
@@ -34,6 +35,16 @@ cp -a var %{buildroot}/
 %config(noreplace) %{_sysconfdir}/systemd/system/qbootctl.service
 %config(noreplace) %{_sysconfdir}/systemd/zram-generator.conf
 %config(noreplace) %{_sharedstatedir}/gdm/.config/monitors.xml
+
+%post
+
+%systemd_post qbootctl.service
+
+%preun
+%systemd_preun qbootctl.service
+
+%postun
+%systemd_postun_with_restart qbootctl.service
 
 %changelog
 * Tue Sep 30 2025 jhuang6451 <xplayerhtz123@outlook.com> - 0.1-1

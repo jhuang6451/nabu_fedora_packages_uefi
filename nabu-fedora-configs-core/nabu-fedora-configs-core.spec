@@ -1,7 +1,7 @@
 %global debug_package %{nil}
 
 Name:           nabu-fedora-configs-core
-Version:        0.4
+Version:        0.5
 Release:        1%{?dist}
 Summary:        Core configuration files for Fedora on Xiaomi Pad 5 (nabu)
 License:        MIT
@@ -29,11 +29,11 @@ This package contains the essential configuration files for running Fedora on th
 cp -a etc %{buildroot}/
 
 %files
-%config(noreplace) %{_sysconfdir}/dracut.conf.d/99-nabu-generic.conf
-%config(noreplace) %{_sysconfdir}/fstab
-%config(noreplace) %{_sysconfdir}/systemd/ukify.conf
-%config(noreplace) %{_sysconfdir}/systemd/system/ath10k-shutdown.service
-%config(noreplace) %{_sysconfdir}/udev/rules.d/99-force-rtc1.rules
+%attr(644, root, root) %config(noreplace) %{_sysconfdir}/dracut.conf.d/99-nabu-generic.conf
+%attr(644, root, root) %config(noreplace) %{_sysconfdir}/fstab
+%attr(644, root, root) %config(noreplace) %{_sysconfdir}/systemd/ukify.conf
+%attr(644, root, root) %config(noreplace) %{_sysconfdir}/systemd/system/ath10k-shutdown.service
+%attr(644, root, root) %config(noreplace) %{_sysconfdir}/udev/rules.d/99-force-rtc1.rules
 
 %post
 # Create the EFI directory as a mount point for the ESP.

@@ -1,7 +1,7 @@
 %global debug_package %{nil}
 
 Name:           nabu-fedora-configs-extra
-Version:        0.4
+Version:        0.5
 Release:        1%{?dist}
 Summary:        Extra configuration files for Fedora on Xiaomi Pad 5 (nabu)
 License:        MIT
@@ -30,11 +30,11 @@ cp -a etc %{buildroot}/
 cp -a var %{buildroot}/
 
 %files
-%config(noreplace) %{_sysconfdir}/environment.d/99-im.conf
-%config(noreplace) %{_sysconfdir}/locale.conf
-%config(noreplace) %{_sysconfdir}/systemd/system/qbootctl.service
-%config(noreplace) %{_sysconfdir}/systemd/zram-generator.conf
-%config(noreplace) %{_sharedstatedir}/gdm/.config/monitors.xml
+%attr(644, root, root) %config(noreplace) %{_sysconfdir}/environment.d/99-im.conf
+%attr(644, root, root) %config(noreplace) %{_sysconfdir}/locale.conf
+%attr(644, root, root) %config(noreplace) %{_sysconfdir}/systemd/system/qbootctl.service
+%attr(644, root, root) %config(noreplace) %{_sysconfdir}/systemd/zram-generator.conf
+%attr(644, root, root) %config(noreplace) %{_sharedstatedir}/gdm/.config/monitors.xml
 
 %post
 

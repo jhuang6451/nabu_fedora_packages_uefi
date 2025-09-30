@@ -1,7 +1,7 @@
 %global debug_package %{nil}
 
 Name:           nabu-fedora-configs-branding
-Version:        0.4
+Version:        0.5
 Release:        1%{?dist}
 Summary:        Custom branding info for Nabu for Fedora.
 License:        MIT
@@ -23,19 +23,24 @@ functionality like repositories and GPG keys
 # Nothing to build as we are just packaging files.
 
 %install
-# The source tarball contains the etc directory with the correct structure.
-# We copy it directly into the buildroot.
-cp -a etc %{buildroot}/
+# Install our custom os-release to a non-conflicting location
+install -D -m 644 etc/os-release %{buildroot}%{_datadir}/nabu-branding/os-release
 
 %files
-%config(noreplace) %{_sysconfdir}/os-release
+# Own the non-conflicting file
+%attr(644, root, root) %{_datadir}/nabu-branding/os-release
 
 %post
-# 在安装后，移除那个悬空的软链接，虽然 dnf 通常会处理
-rm -f /usr/lib/os-release
-ln -s ../../etc/os-release /usr/lib/os-release
-echo "Linked /usr/lib/os-release to custom /etc/os-release."
+# Overwrite /etc/os-release with our custom version after installation
+# This avoids a file conflict at the RPM database level.
+cp %{_datadir}/nabu-branding/os-release /etc/os-release
 
+%preun
+# If the package is being uninstalled, restore the original os-release symlink
+if [ $1 -eq 0 ] ; then
+    rm -f /etc/os-release
+    ln -s /usr/lib/os-release /etc/os-release
+fi
 
 %changelog
 * Tue Sep 30 2025 jhuang6451 <xplayerhtz123@outlook.com> - 0.4-1

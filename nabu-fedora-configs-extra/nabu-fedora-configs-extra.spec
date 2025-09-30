@@ -4,12 +4,14 @@ Name:           nabu-fedora-configs-extra
 Version:        0.1
 Release:        1%{?dist}
 Summary:        Extra configuration files for Fedora on Xiaomi Pad 5 (nabu)
-
 License:        MIT
 URL:            https://github.com/jhuang6451/nabu-fedora
 Source0:        https://github.com/jhuang6451/nabu_fedora_packages/releases/download/v%{version}/%{name}-%{version}.tar.gz
-
 BuildArch:      noarch
+Requires:       fcitx5
+Requires:       qbootctl
+Requires:       zram-generator
+Requires:       gdm
 
 %description
 This package contains extra configuration files for running Fedora on the Xiaomi Pad 5 (nabu), such as display, input method, and performance tweaks

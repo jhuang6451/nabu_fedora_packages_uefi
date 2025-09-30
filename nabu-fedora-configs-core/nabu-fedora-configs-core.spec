@@ -4,12 +4,12 @@ Name:           nabu-fedora-configs-core
 Version:        0.1
 Release:        1%{?dist}
 Summary:        Core configuration files for Fedora on Xiaomi Pad 5 (nabu)
-
 License:        MIT
 URL:            https://github.com/jhuang6451/nabu-fedora
 Source0:        https://github.com/jhuang6451/nabu_fedora_packages/releases/download/v%{version}/%{name}-%{version}.tar.gz
-
 BuildArch:      noarch
+Requires:       dracut
+Requires:       systemd-ukify
 
 %description
 This package contains the essential configuration files for running Fedora on the Xiaomi Pad 5 (nabu)
@@ -31,6 +31,11 @@ cp -a etc %{buildroot}/
 %config(noreplace) %{_sysconfdir}/os-release
 %config(noreplace) %{_sysconfdir}/systemd/ukify.conf
 %config(noreplace) %{_sysconfdir}/udev/rules.d/99-force-rtc1.rules
+
+%post
+# Create the EFI directory as a mount point for the ESP.
+# This is required for UKI generation and bootloader installation.
+mkdir -p /boot/efi
 
 %changelog
 * Tue Sep 30 2025 jhuang6451 <xplayerhtz123@outlook.com> - 0.1-1

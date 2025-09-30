@@ -14,15 +14,17 @@ The following packages are managed in this repository:
 - `nabu-fedora-configs-extra`: Additional configurations for display, input methods, and performance tweaks.
 - `xiaomi-nabu-audio`: Audio configuration files (PulseAudio and ALSA).
 - `xiaomi-nabu-firmware`: Firmware files required for device hardware.
+- `nabu_fedora_configs_branding`: Custom branding info for Nabu for Fedora.
 
 ## Automated Tarball Release Process
 
 This repository uses a fully automated release process powered by GitHub Actions. This process simplifies releases and ensures that COPR has access to clean, versioned source code for each package.
 
-The following packages are managed by this process:
+The following packages are now managed by this process:
 - `nabu-fedora-configs-core`
 - `nabu-fedora-configs-efi`
 - `nabu-fedora-configs-extra`
+- `nabu_fedora_configs_branding`
 
 ### How It Works
 

@@ -28,7 +28,6 @@ cp -a etc %{buildroot}/
 %files
 %config(noreplace) %{_sysconfdir}/dracut.conf.d/99-nabu-generic.conf
 %config(noreplace) %{_sysconfdir}/fstab
-%config(noreplace) %{_sysconfdir}/os-release
 %config(noreplace) %{_sysconfdir}/systemd/ukify.conf
 %config(noreplace) %{_sysconfdir}/udev/rules.d/99-force-rtc1.rules
 

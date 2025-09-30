@@ -1,9 +1,9 @@
 Name:           xiaomi-nabu-audio
 Version:        1
 Release:        1
-Summary:        alsa and pipewire audio profile for mipad5
-License:        MIT
-BuildArch:      noarch
+Summary:        Alsa and pipewire audio profile for mipad5.
+License:        LGPLv2.1
+BuildArch:      aarch64
 Source0:        HiFi.conf
 Source1:        sm8150.conf
 Source2:        89-xiaomi_nabu.conf
@@ -11,7 +11,7 @@ Source3:        nabu.pa
 Requires:       alsa-ucm
 
 %description
-alsa and pipewire audio profile for mipad5
+Alsa and pipewire audio profile for mipad5.
 
 %install
 install -Dm644 "%{SOURCE1}" "%{buildroot}%{_datadir}/alsa/ucm2/conf.d/sm8150/sm8150.conf"

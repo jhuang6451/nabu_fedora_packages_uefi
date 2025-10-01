@@ -25,7 +25,7 @@ jobs:
       - name: Read package list and create tags
         run: |
           # Read file content, filter out empty lines
-          PACKAGES_LIST=$(cat .release-tarballs | grep -v ''^$'')
+          PACKAGES_LIST=$(cat .release-tarballs | grep -v '^$')
 
           for pkg in ${PACKAGES_LIST}; do
             echo "Processing package: ${pkg}"
@@ -50,7 +50,7 @@ jobs:
               STARTING_POINT="${LATEST_TAG}..HEAD"
             fi
 
-            # Get commits since the last tag for this package''s path
+            # Get commits since the last tag for this package's path
             COMMITS_SINCE_LAST_TAG=$(git log ${STARTING_POINT} --pretty=format:"%H %s" -- "${pkg}")
             
             if [ -z "$COMMITS_SINCE_LAST_TAG" ]; then
@@ -69,13 +69,13 @@ jobs:
             # Use a while loop to read commits line by line
             echo "${COMMITS_SINCE_LAST_TAG}" | while IFS= read -r commit_line; do
               # Check for BREAKING CHANGE in the full commit body
-              COMMIT_HASH=$(echo "$commit_line" | cut -d'' '' -f1)
+              COMMIT_HASH=$(echo "$commit_line" | cut -d' ' -f1)
               if git show -s --format=%b ${COMMIT_HASH} | grep -q "BREAKING CHANGE"; then
                 IS_MAJOR=true
               fi
               
               # Check the commit subject
-              COMMIT_SUBJECT=$(echo "$commit_line" | cut -d'' '' -f2-)
+              COMMIT_SUBJECT=$(echo "$commit_line" | cut -d' ' -f2-)
               if [[ "${COMMIT_SUBJECT}" == "feat("* ]]; then
                 IS_MINOR=true
               elif [[ "${COMMIT_SUBJECT}" == "fix("* ]]; then
@@ -90,7 +90,7 @@ jobs:
                 NEXT_VERSION="0.1.0"
             else
                 CURRENT_VERSION=$(echo ${LATEST_TAG} | sed "s/^${pkg}-v//")
-                IFS=''.' read -r -a V_PARTS <<< "${CURRENT_VERSION}"
+                IFS='.' read -r -a V_PARTS <<< "${CURRENT_VERSION}"
                 MAJOR=${V_PARTS[0]}
                 MINOR=${V_PARTS[1]}
                 PATCH=${V_PARTS[2]}

@@ -1,7 +1,7 @@
 %global debug_package %{nil}
 
 Name:           nabu-fedora-dualboot-efi
-Version:        0.5
+Version:        0.6
 Release:        1%{?dist}
 Summary:        rEFInd boot manager files for dual-booting on Xiaomi Pad 5 (nabu)
 License:        GPLv3+ and others
@@ -29,9 +29,7 @@ cp -a boot %{buildroot}/
 
 %files
 %defattr(644, root, root, 755)
-# Own the directories we are shipping to the ESP
-/boot/efi/EFI/Android
-/boot/efi/EFI/BOOT
+/boot/efi/EFI/*
 
 %changelog
 * Tue Sep 30 2025 jhuang6451 <xplayerhtz123@outlook.com> - 0.1-1

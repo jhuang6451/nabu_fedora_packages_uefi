@@ -25,7 +25,7 @@ jobs:
       - name: Read package list and create tags
         run: |
           # Read file content, filter out empty lines
-          PACKAGES_LIST=$(cat release-tarballs.txt | grep -v ''^$'')
+          PACKAGES_LIST=$(cat .release-tarballs | grep -v ''^$'')
 
           for pkg in ${PACKAGES_LIST}; do
             echo "Processing package: ${pkg}"

@@ -37,25 +37,25 @@ This package contains the essential core, audio, and branding configuration file
 
 %install
 install -d -m 755 %{buildroot}%{_sysconfdir}/dracut.conf.d
-install -m 644 %{SOURCE0} %{buildroot}%{_sysconfdir}/dracut.conf.d/99-nabu-generic.conf
-install -m 644 %{SOURCE1} %{buildroot}%{_sysconfdir}/fstab
+install -m 644 %{basename:%{SOURCE0}} %{buildroot}%{_sysconfdir}/dracut.conf.d/99-nabu-generic.conf
+install -m 644 %{basename:%{SOURCE1}} %{buildroot}%{_sysconfdir}/fstab
 install -d -m 755 %{buildroot}%{_sysconfdir}/systemd
-install -m 644 %{SOURCE2} %{buildroot}%{_sysconfdir}/systemd/ukify.conf
+install -m 644 %{basename:%{SOURCE2}} %{buildroot}%{_sysconfdir}/systemd/ukify.conf
 install -d -m 755 %{buildroot}%{_sysconfdir}/pulse/daemon.conf.d
-install -m 644 %{SOURCE3} %{buildroot}%{_sysconfdir}/pulse/daemon.conf.d/89-xiaomi_nabu.conf
+install -m 644 %{basename:%{SOURCE3}} %{buildroot}%{_sysconfdir}/pulse/daemon.conf.d/89-xiaomi_nabu.conf
 install -d -m 755 %{buildroot}%{_sysconfdir}/pulse/default.pa.d
-install -m 644 %{SOURCE4} %{buildroot}%{_sysconfdir}/pulse/default.pa.d/nabu.pa
-install -m 644 %{SOURCE5} %{buildroot}%{_sysconfdir}/os-release
+install -m 644 %{basename:%{SOURCE4}} %{buildroot}%{_sysconfdir}/pulse/default.pa.d/nabu.pa
+install -m 644 %{basename:%{SOURCE5}} %{buildroot}%{_sysconfdir}/os-release
 install -d -m 755 %{buildroot}%{_presetdir}
-install -m 644 %{SOURCE6} %{buildroot}%{_presetdir}/80-nabu-core.preset
+install -m 644 %{basename:%{SOURCE6}} %{buildroot}%{_presetdir}/80-nabu-core.preset
 install -d -m 755 %{buildroot}%{_prefix}/lib/systemd/system
-install -m 644 %{SOURCE7} %{buildroot}%{_prefix}/lib/systemd/system/ath10k-shutdown.service
+install -m 644 %{basename:%{SOURCE7}} %{buildroot}%{_prefix}/lib/systemd/system/ath10k-shutdown.service
 install -d -m 755 %{buildroot}%{_prefix}/lib/udev/rules.d
-install -m 644 %{SOURCE8} %{buildroot}%{_prefix}/lib/udev/rules.d/99-force-rtc1.rules
+install -m 644 %{basename:%{SOURCE8}} %{buildroot}%{_prefix}/lib/udev/rules.d/99-force-rtc1.rules
 install -d -m 755 %{buildroot}%{_datadir}/alsa/ucm2/conf.d/sm8150
-install -m 644 %{SOURCE9} %{buildroot}%{_datadir}/alsa/ucm2/conf.d/sm8150/sm8150.conf
+install -m 644 %{basename:%{SOURCE9}} %{buildroot}%{_datadir}/alsa/ucm2/conf.d/sm8150/sm8150.conf
 install -d -m 755 %{buildroot}%{_datadir}/alsa/ucm2/Xiaomi/nabu
-install -m 644 %{SOURCE10} %{buildroot}%{_datadir}/alsa/ucm2/Xiaomi/nabu/HiFi.conf
+install -m 644 %{basename:%{SOURCE10}} %{buildroot}%{_datadir}/alsa/ucm2/Xiaomi/nabu/HiFi.conf
 
 %files
 %attr(644, root, root) %config(noreplace) %{_sysconfdir}/os-release

@@ -6,7 +6,7 @@ Release:        1%{?dist}
 Summary:        rEFInd boot manager files for dual-booting on Xiaomi Pad 5 (nabu)
 License:        GPLv3+ and others
 URL:            https://github.com/jhuang6451/nabu-fedora
-Source0:        %{name}-%{version}.tar.gz
+Source0:        https://github.com/jhuang6451/nabu-fedora/releases/download/%{name}-%{version}/%{name}-%{version}.tar.gz
 
 BuildArch:      aarch64
 

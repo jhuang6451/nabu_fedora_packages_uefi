@@ -74,57 +74,57 @@ jobs:
           generate_release_notes: true
           files: release_assets/*.tar.gz
 
-  trigger-copr-builds:
-    name: Trigger COPR Builds
-    needs: build-and-release
-    if: needs.build-and-release.outputs.package_name != ''
-    runs-on: ubuntu-latest
-    env:
-      COPR_PROJECT: "jhuang6451/nabu_fedora_packages_uefi"
-      COPR_CHROOTS: "fedora-42-aarch64"
-      PACKAGE_NAME: ${{ needs.build-and-release.outputs.package_name }}
-      VERSION: ${{ needs.build-and-release.outputs.version }}
-      TAG_NAME: ${{ needs.build-and-release.outputs.tag_name }}
+  # trigger-copr-builds:
+  #   name: Trigger COPR Builds
+  #   needs: build-and-release
+  #   if: needs.build-and-release.outputs.package_name != ''
+  #   runs-on: ubuntu-latest
+  #   env:
+  #     COPR_PROJECT: "jhuang6451/nabu_fedora_packages_uefi"
+  #     COPR_CHROOTS: "fedora-42-aarch64"
+  #     PACKAGE_NAME: ${{ needs.build-and-release.outputs.package_name }}
+  #     VERSION: ${{ needs.build-and-release.outputs.version }}
+  #     TAG_NAME: ${{ needs.build-and-release.outputs.tag_name }}
 
-    steps:
-      - name: Install Copr CLI
-        run: sudo pip3 install copr-cli
+  #   steps:
+  #     - name: Install Copr CLI
+  #       run: sudo pip3 install copr-cli
 
-      - name: Configure Copr credentials
-        run: |
-          mkdir -p ~/.config
-          echo "[copr-cli]" > ~/.config/copr
-          echo "login = ${{ secrets.COPR_LOGIN }}" >> ~/.config/copr
-          echo "username = ${{ secrets.COPR_USERNAME }}" >> ~/.config/copr
-          echo "token = ${{ secrets.COPR_TOKEN }}" >> ~/.config/copr
-          echo "copr_url = ${{ secrets.COPR_API_URL }}" >> ~/.config/copr
+  #     - name: Configure Copr credentials
+  #       run: |
+  #         mkdir -p ~/.config
+  #         echo "[copr-cli]" > ~/.config/copr
+  #         echo "login = ${{ secrets.COPR_LOGIN }}" >> ~/.config/copr
+  #         echo "username = ${{ secrets.COPR_USERNAME }}" >> ~/.config/copr
+  #         echo "token = ${{ secrets.COPR_TOKEN }}" >> ~/.config/copr
+  #         echo "copr_url = ${{ secrets.COPR_API_URL }}" >> ~/.config/copr
 
-      - name: Check out code
-        uses: actions/checkout@v4
+  #     - name: Check out code
+  #       uses: actions/checkout@v4
 
-      - name: Trigger COPR build
-        run: |
-          REPO_URL="https://github.com/${{ github.repository }}.git"
+  #     - name: Trigger COPR build
+  #       run: |
+  #         REPO_URL="https://github.com/${{ github.repository }}.git"
 
-          echo "Triggering build for ${PACKAGE_NAME} tag ${TAG_NAME} in COPR project ${{ env.COPR_PROJECT }}"
+  #         echo "Triggering build for ${PACKAGE_NAME} tag ${TAG_NAME} in COPR project ${{ env.COPR_PROJECT }}"
 
-          SPEC_PATH="${PACKAGE_NAME}/${PACKAGE_NAME}.spec"
-          # Special case for the kernel package
-          if [ "$PACKAGE_NAME" == "kernel-sm8150" ]; then
-            SPEC_PATH="kernel-sm8150/linux-sm8150.spec"
-          fi
+  #         SPEC_PATH="${PACKAGE_NAME}/${PACKAGE_NAME}.spec"
+  #         # Special case for the kernel package
+  #         if [ "$PACKAGE_NAME" == "kernel-sm8150" ]; then
+  #           SPEC_PATH="kernel-sm8150/linux-sm8150.spec"
+  #         fi
 
-          echo "Submitting build for ${PACKAGE_NAME} with spec file ${SPEC_PATH}..."
+  #         echo "Submitting build for ${PACKAGE_NAME} with spec file ${SPEC_PATH}..."
 
-          for chroot in ${{ env.COPR_CHROOTS }};
-          do
-            echo "  -> for chroot ${chroot}"
-            copr-cli build-scm \
-              --chroot "${chroot}" \
-              --spec "${SPEC_PATH}" \
-              --method git \
-              --git-url "${REPO_URL}" \
-              --git-commit "${TAG_NAME}" \
-              --rpmbuild-define "version ${VERSION}" \
-              "${{ env.COPR_PROJECT }}"
-          done
+  #         for chroot in ${{ env.COPR_CHROOTS }};
+  #         do
+  #           echo "  -> for chroot ${chroot}"
+  #           copr-cli build-scm \
+  #             --chroot "${chroot}" \
+  #             --spec "${SPEC_PATH}" \
+  #             --method git \
+  #             --git-url "${REPO_URL}" \
+  #             --git-commit "${TAG_NAME}" \
+  #             --rpmbuild-define "version ${VERSION}" \
+  #             "${{ env.COPR_PROJECT }}"
+  #         done

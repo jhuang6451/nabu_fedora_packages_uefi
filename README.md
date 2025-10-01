@@ -37,6 +37,7 @@ These are packages for which this repository is the source of truth. Their versi
     - `feat:` results in a MINOR version increase (e.g., `1.1.0` -> `1.2.0`).
     - `fix:` results in a PATCH version increase (e.g., `1.1.0` -> `1.1.1`).
     - A `BREAKING CHANGE:` footer results in a MAJOR version increase (e.g., `1.1.0` -> `2.0.0`).
+    - Other types such as `docs`, `style`, `refactor`, and `test` will not trigger version upgrades.
 3.  **Push the commit(s)** to the `main` branch.
 
 That's it! A GitHub Action (`version-and-tag.yml`) will detect the push, calculate the new version, and push a new package tag (e.g., `nabu-fedora-configs-core-v1.2.0`). This new tag will, in turn, trigger the `create-release-tarballs.yml` workflow to create a GitHub Release and trigger a COPR build.

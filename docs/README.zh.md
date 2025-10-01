@@ -37,6 +37,7 @@
     - `feat:` 代表新功能，将触发 **MINOR** 版本提升 (例如 `1.1.0` -> `1.2.0`)。
     - `fix:` 代表问题修复，将触发 **PATCH** 版本提升 (例如 `1.1.0` -> `1.1.1`)。
     - 在提交信息的末尾添加 `BREAKING CHANGE:` 将触发 **MAJOR** 版本提升 (例如 `1.1.0` -> `2.0.0`)。
+    - 其他类型如 docs, style, refactor, test 等不会触发版本提升。
 3.  **推送提交**：将一个或多个提交推送到 `main` 分支。
 
 完成！GitHub Action (`version-and-tag.yml`) 会检测到新的提交，计算出新版本号，并自动推送一个新的软件包标签（例如 `nabu-fedora-configs-core-v1.2.0`）。这个新标签会接着触发 `create-release-tarballs.yml` 工作流，以创建 GitHub Release 并启动 COPR 构建。

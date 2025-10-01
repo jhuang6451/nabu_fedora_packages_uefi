@@ -1,17 +1,16 @@
 %undefine        _debugsource_packages
 %global tag      6.16
-Version:         6.16.0
+Version:         6.16
 Release:         4.sm8150%{?dist}
 ExclusiveArch:   aarch64
 Name:            kernel-sm8150
-Summary:         The Linux kernel for sm8150 devices
+Summary:         Mainline Linux kernel for sm8150 devices
 License:         GPLv2
 URL:             https://gitlab.com/sm8150-mainline/linux
 Source0:         %{url}/-/archive/sm8150/%{tag}/linux-sm8150-%{tag}.tar.gz
 Source1:         extra-sm8150.config
 
-# 确保构建环境中包含 dracut 用于生成 initramfs
-# kernel-install 工具由 systemd 包提供，通常已存在于标准构建环境中
+
 BuildRequires:   bc bison dwarves diffutils elfutils-devel findutils gcc gcc-c++ git-core hmaccalc hostname make openssl-devel perl-interpreter rsync tar which flex bzip2 xz zstd python3 python3-devel python3-pyyaml rust rust-src bindgen rustfmt clippy opencsd-devel net-tools dracut
 
 Provides:        kernel               = %{version}-%{release}
@@ -22,7 +21,7 @@ Provides:        kernel-modules-core  = %{version}-%{release}
 %global uname_r %{version}-%{release}.%{_target_cpu}
 
 %description
-Mainline kernel for sm8150 (Qualcomm Snapdragon 855/860) devices, packaged for standard Fedora systems with UEFI boot support.
+Mainline kernel for sm8150 (Qualcomm Snapdragon 855/860) devices, packaged for standard Fedora systems with UEFI boot support
 
 %prep
 %autosetup -n linux-sm8150-%{tag}
@@ -31,7 +30,7 @@ Mainline kernel for sm8150 (Qualcomm Snapdragon 855/860) devices, packaged for s
 make defconfig sm8150.config
 
 %build
-# 移除既有的 CONFIG_LOCALVERSION，我们将通过 make 命令的参数来控制它
+# 移除既有的 CONFIG_LOCALVERSION，通过 make 命令的参数来控制它
 sed -i '/^CONFIG_LOCALVERSION=/d' .config
 # 追加额外的配置
 cat %{SOURCE1} >> .config

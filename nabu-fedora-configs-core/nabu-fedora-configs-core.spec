@@ -14,6 +14,7 @@ Requires:       systemd-ukify
 Requires:       rmtfs
 Requires:       tqftpserv
 Requires:       alsa-ucm
+Requires:       fedora-release-common
 
 %description
 This package contains the essential core, audio, and branding configuration files for running Fedora on the Xiaomi Pad 5 (nabu)

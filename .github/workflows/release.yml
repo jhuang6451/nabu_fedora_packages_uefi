@@ -24,12 +24,18 @@ jobs:
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
+          #!/bin/bash
+
+          # 确保脚本在出错时立即退出
+          set -e
+
           PACKAGES_LIST=$(cat .release-tarballs | grep -v '^$')
           RELEASES_JSON="[]"
 
           for pkg in ${PACKAGES_LIST}; do
             echo "--- Processing package: ${pkg} ---"
 
+            # 修复 1: 在 if 条件语句后面添加 'then'
             if [ -f .no-auto-version ] && grep -qx "${pkg}" .no-auto-version; then
               echo "Skipping ${pkg} as it is in the auto-version ignore list."
               continue
@@ -39,13 +45,15 @@ jobs:
             STARTING_POINT=""
             if [ -z "$LATEST_TAG" ]; then
               echo "No previous tag found for ${pkg}."
-              STARTING_POINT=""
+              # 如果没有标签，则从第一次提交开始计算
+              STARTING_POINT="HEAD"
             else
               echo "Latest tag for ${pkg} is ${LATEST_TAG}"
               STARTING_POINT="${LATEST_TAG}..HEAD"
             fi
 
-            COMMITS_SINCE_LAST_TAG=$(git log ${STARTING_POINT} --pretty=format:"%H %s" -- "${pkg}")
+            # --no-merges 选项可以排除合并提交，使日志更干净
+            COMMITS_SINCE_LAST_TAG=$(git log ${STARTING_POINT} --pretty=format:"%H %s" --no-merges -- "${pkg}")
             if [ -z "$COMMITS_SINCE_LAST_TAG" ]; then
               echo "No new commits for ${pkg}. Skipping."
               continue
@@ -54,42 +62,58 @@ jobs:
             echo "Found new commits: ${COMMITS_SINCE_LAST_TAG}"
 
             IS_MAJOR=false; IS_MINOR=false; IS_PATCH=false
-            echo "${COMMITS_SINCE_LAST_TAG}" | while IFS= read -r commit_line; do
+            
+            # 修复 3: 使用进程替换 < <(...) 来读取COMMITS_SINCE_LAST_TAG
+            # 这样可以避免 `while` 循环在子 Shell 中运行，从而保证循环内对变量的修改在循环外依然有效
+            while IFS= read -r commit_line; do
               COMMIT_HASH=$(echo "$commit_line" | cut -d' ' -f1)
-              if git show -s --format=%b ${COMMIT_HASH} | grep -q "BREAKING CHANGE"; then IS_MAJOR=true; fi
+              if git show -s --format=%b "${COMMIT_HASH}" | grep -q "BREAKING CHANGE"; then IS_MAJOR=true; fi
+              
               COMMIT_SUBJECT=$(echo "$commit_line" | cut -d' ' -f2-)
-              if [[ "${COMMIT_SUBJECT}" == "feat("* ]]; then IS_MINOR=true; fi
-              if [[ "${COMMIT_SUBJECT}" == "fix("* ]]; then IS_PATCH=true; fi
-            done
+              
+              # 修复 2: 使用正确的 Shell 模式匹配 (Globbing) 来检测提交类型
+              # 'fix(' 和 'feat(' 后面的 '*' 是通配符，可以匹配任意字符
+              if [[ "${COMMIT_SUBJECT}" == feat\(** ]]; then IS_MINOR=true; fi
+              if [[ "${COMMIT_SUBJECT}" == fix\(** ]]; then IS_PATCH=true; fi
+            done < <(echo "${COMMITS_SINCE_LAST_TAG}")
 
             NEXT_VERSION=""
             if [ -z "$LATEST_TAG" ]; then
+              # 如果没有历史版本，则从 0.1.0 开始
               NEXT_VERSION="0.1.0"
             else
-              CURRENT_VERSION=$(echo ${LATEST_TAG} | sed "s/^${pkg}-v//")
+              # 从标签中提取版本号，例如 "pkg-v1.2.3" -> "1.2.3"
+              CURRENT_VERSION=$(echo "${LATEST_TAG}" | sed "s/^${pkg}-v//")
               IFS='.' read -r -a V_PARTS <<< "${CURRENT_VERSION}"
               MAJOR=${V_PARTS[0]}; MINOR=${V_PARTS[1]}; PATCH=${V_PARTS[2]}
 
-              if ${IS_MAJOR}; then MAJOR=$((MAJOR + 1)); MINOR=0; PATCH=0;
-              elif ${IS_MINOR}; then MINOR=$((MINOR + 1)); PATCH=0;
-              elif ${IS_PATCH}; then PATCH=$((PATCH + 1));
-              else echo "No version-bumping commits for ${pkg}. Skipping."; continue; fi
+              if [ "${IS_MAJOR}" = true ]; then MAJOR=$((MAJOR + 1)); MINOR=0; PATCH=0;
+              elif [ "${IS_MINOR}" = true ]; then MINOR=$((MINOR + 1)); PATCH=0;
+              elif [ "${IS_PATCH}" = true ]; then PATCH=$((PATCH + 1));
+              else
+                echo "No version-bumping commits for ${pkg}. Skipping."
+                continue
+              fi
               NEXT_VERSION="${MAJOR}.${MINOR}.${PATCH}"
             fi
             
             NEW_TAG="${pkg}-v${NEXT_VERSION}"
             echo "New version for ${pkg} is ${NEXT_VERSION}. Creating release ${NEW_TAG}"
 
+            # 创建发布资源
             rm -rf release_assets && mkdir -p release_assets
             tarball_name="${pkg}-${NEXT_VERSION}.tar.gz"
+            # 使用 git archive 创建归档
             (cd "${pkg}" && git archive --format=tar.gz --prefix="${pkg}-${NEXT_VERSION}/" -o "${OLDPWD}/release_assets/${tarball_name}" HEAD .)
             
+            # 使用 gh CLI 创建 GitHub Release
             gh release create "${NEW_TAG}" "release_assets/${tarball_name}" --generate-notes --title "Release ${NEW_TAG}"
 
-            RELEASES_JSON=$(echo $RELEASES_JSON | jq --arg pkg "$pkg" --arg ver "$NEXT_VERSION" --arg tag "$NEW_TAG" '. + [{package: $pkg, version: $ver, tag: $tag}]')
+            # 使用 jq 工具安全地向 JSON 数组中添加新对象
+            RELEASES_JSON=$(echo "${RELEASES_JSON}" | jq --arg pkg "$pkg" --arg ver "$NEXT_VERSION" --arg tag "$NEW_TAG" '. + [{package: $pkg, version: $ver, tag: $tag}]')
           done
 
-          echo "new_releases=${RELEASES_JSON}" >> $GITHUB_OUTPUT
+          echo "new_releases=${RELEASES_JSON}" >> "$GITHUB_OUTPUT"
 
   # trigger_copr_builds:
   #   needs: create_releases

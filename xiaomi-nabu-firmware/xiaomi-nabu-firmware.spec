@@ -1,5 +1,5 @@
 Name:           xiaomi-nabu-firmware
-Version:        %{version}
+Version:        0.1
 Release:        1%{?dist}
 Summary:        Firmware for running linux on Xiaomi Pad 5 (Nabu)
 License:        MIT

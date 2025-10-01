@@ -1,6 +1,6 @@
 %undefine        _debugsource_packages
 %global tag      6.16
-Version:         %{version}
+Version:         6.16
 Release:         4.sm8150%{?dist}
 ExclusiveArch:   aarch64
 Name:            kernel-sm8150

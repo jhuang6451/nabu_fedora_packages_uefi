@@ -6,7 +6,17 @@ Release:        1%{?dist}
 Summary:        Core, audio and branding configuration files for Fedora on Xiaomi Pad 5 (nabu)
 License:        MIT
 URL:            https://github.com/jhuang6451/nabu-fedora
-Source0:        %{name}-%{version}.tar.gz
+Source0:        etc/dracut.conf.d/99-nabu-generic.conf
+Source1:        etc/fstab
+Source2:        etc/systemd/ukify.conf
+Source3:        etc/pulse/daemon.conf.d/89-xiaomi_nabu.conf
+Source4:        etc/pulse/default.pa.d/nabu.pa
+Source5:        etc/os-release
+Source6:        usr/lib/systemd/system-preset/80-nabu-core.preset
+Source7:        usr/lib/systemd/system/ath10k-shutdown.service
+Source8:        usr/lib/udev/rules.d/99-force-rtc1.rules
+Source9:        usr/share/alsa/ucm2/conf.d/sm8150/sm8150.conf
+Source10:       usr/share/alsa/ucm2/Xiaomi/nabu/HiFi.conf
 BuildArch:      noarch
 BuildRequires:  systemd-rpm-macros
 Requires:       dracut
@@ -20,15 +30,32 @@ Requires:       fedora-release-common
 This package contains the essential core, audio, and branding configuration files for running Fedora on the Xiaomi Pad 5 (nabu)
 
 %prep
-%autosetup
+# No prep needed, using local files
 
 %build
 # Nothing to build as we are just packaging files.
 
 %install
-# The source tarball contains the etc directory with the correct structure.
-cp -a etc %{buildroot}/
-cp -a usr %{buildroot}/
+install -d -m 755 %{buildroot}%{_sysconfdir}/dracut.conf.d
+install -m 644 %{SOURCE0} %{buildroot}%{_sysconfdir}/dracut.conf.d/99-nabu-generic.conf
+install -m 644 %{SOURCE1} %{buildroot}%{_sysconfdir}/fstab
+install -d -m 755 %{buildroot}%{_sysconfdir}/systemd
+install -m 644 %{SOURCE2} %{buildroot}%{_sysconfdir}/systemd/ukify.conf
+install -d -m 755 %{buildroot}%{_sysconfdir}/pulse/daemon.conf.d
+install -m 644 %{SOURCE3} %{buildroot}%{_sysconfdir}/pulse/daemon.conf.d/89-xiaomi_nabu.conf
+install -d -m 755 %{buildroot}%{_sysconfdir}/pulse/default.pa.d
+install -m 644 %{SOURCE4} %{buildroot}%{_sysconfdir}/pulse/default.pa.d/nabu.pa
+install -m 644 %{SOURCE5} %{buildroot}%{_sysconfdir}/os-release
+install -d -m 755 %{buildroot}%{_presetdir}
+install -m 644 %{SOURCE6} %{buildroot}%{_presetdir}/80-nabu-core.preset
+install -d -m 755 %{buildroot}%{_prefix}/lib/systemd/system
+install -m 644 %{SOURCE7} %{buildroot}%{_prefix}/lib/systemd/system/ath10k-shutdown.service
+install -d -m 755 %{buildroot}%{_prefix}/lib/udev/rules.d
+install -m 644 %{SOURCE8} %{buildroot}%{_prefix}/lib/udev/rules.d/99-force-rtc1.rules
+install -d -m 755 %{buildroot}%{_datadir}/alsa/ucm2/conf.d/sm8150
+install -m 644 %{SOURCE9} %{buildroot}%{_datadir}/alsa/ucm2/conf.d/sm8150/sm8150.conf
+install -d -m 755 %{buildroot}%{_datadir}/alsa/ucm2/Xiaomi/nabu
+install -m 644 %{SOURCE10} %{buildroot}%{_datadir}/alsa/ucm2/Xiaomi/nabu/HiFi.conf
 
 %files
 %attr(644, root, root) %config(noreplace) %{_sysconfdir}/os-release

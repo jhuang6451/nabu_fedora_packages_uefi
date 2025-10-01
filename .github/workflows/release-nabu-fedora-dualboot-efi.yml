@@ -1,0 +1,70 @@
+name: Release nabu-fedora-dualboot-efi
+
+on:
+  push:
+    branches:
+      - "6.16"
+    paths:
+      - 'nabu-fedora-dualboot-efi/nabu-fedora-dualboot-efi.spec'
+
+jobs:
+  release:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+        with:
+          # Fetch depth of 2 is required to compare HEAD and HEAD~1
+          fetch-depth: 2
+
+      - name: Check for version change
+        id: check_version
+        run: |
+          SPEC_FILE="nabu-fedora-dualboot-efi/nabu-fedora-dualboot-efi.spec"
+          
+          # Extract version from the current state of the spec file
+          VERSION=$(grep -oP '(?<=^Version:\s{0,100})\S+' "$SPEC_FILE")
+          
+          # Extract version from the previous commit
+          # Use a fallback in case the file didn't exist or grep fails
+          PREV_VERSION=$(git show HEAD~1:"$SPEC_FILE" | grep -oP '(?<=^Version:\s{0,100})\S+' || echo "0")
+          
+          echo "Current version: $VERSION"
+          echo "Previous version: $PREV_VERSION"
+          
+          if [ "$VERSION" == "$PREV_VERSION" ]; then
+            echo "Version has not changed."
+            echo "changed=false" >> $GITHUB_OUTPUT
+          else
+            echo "Version changed from $PREV_VERSION to $VERSION."
+            echo "changed=true" >> $GITHUB_OUTPUT
+            echo "version=$VERSION" >> $GITHUB_OUTPUT
+          fi
+
+      - name: Create Tarball
+        if: steps.check_version.outputs.changed == 'true'
+        run: |
+          PKG_NAME="nabu-fedora-dualboot-efi"
+          VERSION=${{ steps.check_version.outputs.version }}
+          DIR_NAME="${PKG_NAME}-${VERSION}"
+          TARBALL_NAME="${DIR_NAME}.tar.gz"
+          
+          # Rename the directory to include the version for packaging
+          mv "$PKG_NAME" "$DIR_NAME"
+          
+          # Create the tarball
+          tar -czvf "$TARBALL_NAME" "$DIR_NAME"
+          
+          # Rename it back to keep the workspace clean for subsequent steps
+          mv "$DIR_NAME" "$PKG_NAME"
+          
+          echo "TARBALL_NAME=$TARBALL_NAME" >> $GITHUB_ENV
+
+      - name: Create GitHub Release
+        if: steps.check_version.outputs.changed == 'true'
+        uses: softprops/action-gh-release@v1
+        with:
+          tag_name: nabu-fedora-dualboot-efi-${{ steps.check_version.outputs.version }}
+          files: ${{ env.TARBALL_NAME }}
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}

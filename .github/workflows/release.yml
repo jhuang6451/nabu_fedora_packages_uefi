@@ -1,0 +1,145 @@
+name: Release Workflow
+
+on:
+  push:
+    branches:
+      - 6.16-test
+
+permissions:
+  contents: write
+
+jobs:
+  create_releases:
+    runs-on: ubuntu-latest
+    outputs:
+      new_releases: ${{ steps.version_step.outputs.new_releases }}
+    steps:
+      - name: Check out code
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0 # Required to analyze all commits
+
+      - name: Process packages and create releases
+        id: version_step
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          PACKAGES_LIST=$(cat .release-tarballs | grep -v '^$')
+          RELEASES_JSON="[]"
+
+          for pkg in ${PACKAGES_LIST}; do
+            echo "--- Processing package: ${pkg} ---"
+
+            if [ -f .no-auto-version ] && grep -qx "${pkg}" .no-auto-version;
+              echo "Skipping ${pkg} as it is in the auto-version ignore list."
+              continue
+            fi
+
+            LATEST_TAG=$(git tag --list "${pkg}-v*" --sort=-v:refname | head -n 1)
+            STARTING_POINT=""
+            if [ -z "$LATEST_TAG" ]; then
+              echo "No previous tag found for ${pkg}."
+              STARTING_POINT=""
+            else
+              echo "Latest tag for ${pkg} is ${LATEST_TAG}"
+              STARTING_POINT="${LATEST_TAG}..HEAD"
+            fi
+
+            COMMITS_SINCE_LAST_TAG=$(git log ${STARTING_POINT} --pretty=format:"%H %s" -- "${pkg}")
+            if [ -z "$COMMITS_SINCE_LAST_TAG" ]; then
+              echo "No new commits for ${pkg}. Skipping."
+              continue
+            fi
+
+            echo "Found new commits: ${COMMITS_SINCE_LAST_TAG}"
+
+            IS_MAJOR=false; IS_MINOR=false; IS_PATCH=false
+            echo "${COMMITS_SINCE_LAST_TAG}" | while IFS= read -r commit_line; do
+              COMMIT_HASH=$(echo "$commit_line" | cut -d' ' -f1)
+              if git show -s --format=%b ${COMMIT_HASH} | grep -q "BREAKING CHANGE"; then IS_MAJOR=true; fi
+              COMMIT_SUBJECT=$(echo "$commit_line" | cut -d' ' -f2-)
+              if [[ "${COMMIT_SUBJECT}" == "feat("* ]]; then IS_MINOR=true; fi
+              if [[ "${COMMIT_SUBJECT}" == "fix("* ]]; then IS_PATCH=true; fi
+            done
+
+            NEXT_VERSION=""
+            if [ -z "$LATEST_TAG" ]; then
+              NEXT_VERSION="0.1.0"
+            else
+              CURRENT_VERSION=$(echo ${LATEST_TAG} | sed "s/^${pkg}-v//")
+              IFS='.' read -r -a V_PARTS <<< "${CURRENT_VERSION}"
+              MAJOR=${V_PARTS[0]}; MINOR=${V_PARTS[1]}; PATCH=${V_PARTS[2]}
+
+              if ${IS_MAJOR}; then MAJOR=$((MAJOR + 1)); MINOR=0; PATCH=0;
+              elif ${IS_MINOR}; then MINOR=$((MINOR + 1)); PATCH=0;
+              elif ${IS_PATCH}; then PATCH=$((PATCH + 1));
+              else echo "No version-bumping commits for ${pkg}. Skipping."; continue; fi
+              NEXT_VERSION="${MAJOR}.${MINOR}.${PATCH}"
+            fi
+            
+            NEW_TAG="${pkg}-v${NEXT_VERSION}"
+            echo "New version for ${pkg} is ${NEXT_VERSION}. Creating release ${NEW_TAG}"
+
+            rm -rf release_assets && mkdir -p release_assets
+            tarball_name="${pkg}-${NEXT_VERSION}.tar.gz"
+            (cd "${pkg}" && git archive --format=tar.gz --prefix="${pkg}-${NEXT_VERSION}/" -o "${OLDPWD}/release_assets/${tarball_name}" HEAD .)
+            
+            gh release create "${NEW_TAG}" "release_assets/${tarball_name}" --generate-notes --title "Release ${NEW_TAG}"
+
+            RELEASES_JSON=$(echo $RELEASES_JSON | jq --arg pkg "$pkg" --arg ver "$NEXT_VERSION" --arg tag "$NEW_TAG" '. + [{package: $pkg, version: $ver, tag: $tag}]')
+          done
+
+          echo "new_releases=${RELEASES_JSON}" >> $GITHUB_OUTPUT
+
+  # trigger_copr_builds:
+  #   needs: create_releases
+  #   if: needs.create_releases.outputs.new_releases != '[]'
+  #   runs-on: ubuntu-latest
+  #   strategy:
+  #     matrix: ${{ fromJson(needs.create_releases.outputs.new_releases) }}
+    
+  #   env:
+  #     COPR_PROJECT: "jhuang6451/nabu_fedora_packages_uefi"
+  #     COPR_CHROOTS: "fedora-42-aarch64"
+  #     PACKAGE_NAME: ${{ matrix.package }}
+  #     VERSION: ${{ matrix.version }}
+  #     TAG_NAME: ${{ matrix.tag }}
+
+  #   steps:
+  #     - name: Check out code
+  #       uses: actions/checkout@v4
+  #       with:
+  #         ref: ${{ matrix.tag }}
+
+  #     - name: Install Copr CLI
+  #       run: sudo pip3 install copr-cli
+
+  #     - name: Configure Copr credentials
+  #       run: |
+  #         mkdir -p ~/.config
+  #         echo "[copr-cli]" > ~/.config/copr
+  #         echo "login = ${{ secrets.COPR_LOGIN }}" >> ~/.config/copr
+  #         echo "username = ${{ secrets.COPR_USERNAME }}" >> ~/.config/copr
+  #         echo "token = ${{ secrets.COPR_TOKEN }}" >> ~/.config/copr
+  #         echo "copr_url = ${{ secrets.COPR_API_URL }}" >> ~/.config/copr
+
+  #     - name: Trigger COPR build
+  #       run: |
+  #         REPO_URL="https://github.com/${{ github.repository }}.git"
+  #         echo "Triggering COPR build for ${PACKAGE_NAME} tag ${TAG_NAME}"
+          
+  #         SPEC_PATH="${PACKAGE_NAME}/${PACKAGE_NAME}.spec"
+  #         if [ "$PACKAGE_NAME" == "kernel-sm8150" ]; then
+  #           SPEC_PATH="kernel-sm8150/linux-sm8150.spec"
+  #         fi
+          
+  #         for chroot in ${{ env.COPR_CHROOTS }};
+  #           copr-cli build-scm \
+  #             --chroot "${chroot}" \
+  #             --spec "${SPEC_PATH}" \
+  #             --method git \
+  #             --git-url "${REPO_URL}" \
+  #             --git-commit "${TAG_NAME}" \
+  #             --rpmbuild-define "version ${VERSION}" \
+  #             "${{ env.COPR_PROJECT }}"
+  #         done

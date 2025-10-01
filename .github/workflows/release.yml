@@ -109,8 +109,7 @@ jobs:
             # 使用 gh CLI 创建 GitHub Release
             gh release create "${NEW_TAG}" "release_assets/${tarball_name}" --generate-notes --title "Release ${NEW_TAG}"
 
-            # 使用 jq 工具安全地向 JSON 数组中添加新对象
-            RELEASES_JSON=$(echo "${RELEASES_JSON}" | jq --arg pkg "$pkg" --arg ver "$NEXT_VERSION" --arg tag "$NEW_TAG" '. + [{package: $pkg, version: $ver, tag: $tag}]')
+            RELEASES_JSON=$(echo "${RELEASES_JSON}" | jq -c --arg pkg "$pkg" --arg ver "$NEXT_VERSION" --arg tag "$NEW_TAG" '. + [{package: $pkg, version: $ver, tag: $tag}]')
           done
 
           echo "new_releases=${RELEASES_JSON}" >> "$GITHUB_OUTPUT"

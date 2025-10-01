@@ -1,7 +1,7 @@
 %global debug_package %{nil}
 
 Name:           nabu-fedora-configs-core
-Version:        0.7
+Version:        0.8
 Release:        1%{?dist}
 Summary:        Core, audio and branding configuration files for Fedora on Xiaomi Pad 5 (nabu)
 License:        MIT
@@ -47,7 +47,7 @@ cp -a usr %{buildroot}/
 # Create the EFI directory as a mount point for the ESP.
 # This is required for UKI generation and bootloader installation.
 mkdir -p /boot/efi
-%systemd_post
+%systemd_post ath10k-shutdown.service
 
 %preun
 %systemd_preun ath10k-shutdown.service rmtfs.service tqftpserv.service

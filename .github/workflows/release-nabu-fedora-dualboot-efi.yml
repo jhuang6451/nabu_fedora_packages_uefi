@@ -3,7 +3,7 @@ name: Release nabu-fedora-dualboot-efi
 on:
   push:
     branches:
-      - "6.16"
+      - "6.16-manual"
     paths:
       - 'nabu-fedora-dualboot-efi/nabu-fedora-dualboot-efi.spec'
 
@@ -14,6 +14,7 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v4
         with:
+          ref: ${{ github.ref_name }}
           # Fetch depth of 2 is required to compare HEAD and HEAD~1
           fetch-depth: 2
 

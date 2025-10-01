@@ -24,11 +24,11 @@ jobs:
           SPEC_FILE="nabu-fedora-dualboot-efi/nabu-fedora-dualboot-efi.spec"
           
           # Extract version from the current state of the spec file
-          VERSION=$(grep -oP '(?<=^Version:\s{0,100})\S+' "$SPEC_FILE")
+          VERSION=$(grep '^Version:' "$SPEC_FILE" | awk '{print $2}')
           
           # Extract version from the previous commit
           # Use a fallback in case the file didn't exist or grep fails
-          PREV_VERSION=$(git show HEAD~1:"$SPEC_FILE" | grep -oP '(?<=^Version:\s{0,100})\S+' || echo "0")
+          PREV_VERSION=$(git show HEAD~1:"$SPEC_FILE" | grep '^Version:' | awk '{print $2}' || echo "0")
           
           echo "Current version: $VERSION"
           echo "Previous version: $PREV_VERSION"

@@ -1,12 +1,12 @@
 %global debug_package %{nil}
 
 Name:           nabu-fedora-dualboot-efi
-Version:        0.8
+Version:        0.9
 Release:        1%{?dist}
+BuildArch:      aarch64
 Summary:        rEFInd boot manager files for dual-booting on Xiaomi Pad 5 (nabu)
 License:        GPLv3+ and others
 URL:            https://github.com/jhuang6451/nabu-fedora
-BuildArch:      aarch64
 Source0:        https://github.com/jhuang6451/nabu-fedora/releases/download/%{name}-%{version}/%{name}-%{version}.tar.gz
 
 %description

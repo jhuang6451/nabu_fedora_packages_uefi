@@ -1,71 +1,69 @@
-# Fedora Packages for Xiaomi Pad 5 (nabu)
+[简体中文](docs/README.zh.md)
 
-This repository contains the source files and RPM `.spec` files for various packages required to run Fedora on the Xiaomi Pad 5 (nabu). It is structured as a "monorepo", managing multiple independent packages within a single Git repository.
+# Nabu Fedora Packages
 
-These packages are intended to be built in a [COPR](https://copr.fedorainfracloud.org/) repository.
+This repository contains RPM spec files and configurations for running Fedora on the Xiaomi Pad 5 (nabu).
 
-## Managed Packages
+## Packages
 
-The following packages are managed in this repository:
+This repository manages the following packages:
 
-- `kernel-sm8150`: The Linux kernel compiled for the SM8150 platform.
-- `nabu-fedora-configs-core`: Core system configuration files.
-- `nabu-fedora-configs-efi`: EFI bootloader configurations.
-- `nabu-fedora-configs-extra`: Additional configurations for display, input methods, and performance tweaks.
-- `xiaomi-nabu-audio`: Audio configuration files (PulseAudio and ALSA).
-- `xiaomi-nabu-firmware`: Firmware files required for device hardware.
-- `nabu_fedora_configs_branding`: Custom branding info for Nabu for Fedora.
+- `kernel-sm8150`
+- `xiaomi-nabu-firmware`
+- `nabu-fedora-configs-core`
+- `nabu-fedora-configs-extra`
+- `nabu-fedora-configs-gnome`
+- `nabu-fedora-dualboot-efi`
 
-## Automated Tarball Release Process
+## Versioning and Release Process
 
-This repository uses a fully automated release process powered by GitHub Actions. This process simplifies releases and ensures that COPR has access to clean, versioned source code for each package.
+This repository uses a hybrid model for versioning and releasing packages, handled automatically by GitHub Actions. Packages are divided into two categories based on their versioning strategy.
 
-The following packages are now managed by this process:
+### Package Categories
+
+#### 1. Automatically Versioned Packages
+
+These are packages for which this repository is the source of truth. Their versions are determined automatically based on the commit history.
 
 - `nabu-fedora-configs-core`
-- `nabu-fedora-configs-efi`
 - `nabu-fedora-configs-extra`
-- `nabu_fedora_configs_branding`
+- `nabu-fedora-configs-gnome`
+- `nabu-fedora-dualboot-efi`
 
-### How It Works
+**Release Process:**
 
-1.  **Trigger**: The workflow is triggered whenever a new Git tag starting with `v` (e.g., `v0.1`, `v1.2.3`) is pushed to the repository.
+1.  **Make changes** to the files within one of the package directories.
+2.  **Commit the changes** using the [Conventional Commits](https://www.conventionalcommits.org/) specification. The commit message `type` determines the version bump:
+    - `feat:` results in a MINOR version increase (e.g., `1.1.0` -> `1.2.0`).
+    - `fix:` results in a PATCH version increase (e.g., `1.1.0` -> `1.1.1`).
+    - A `BREAKING CHANGE:` footer results in a MAJOR version increase (e.g., `1.1.0` -> `2.0.0`).
+3.  **Push the commit(s)** to the `main` branch.
 
-2.  **Tarballs List**: The workflow reads the list of package directories from the `release-tarballs.txt` file in the repository root. This file acts as the single source of truth for which packages should be released.
+That's it! A GitHub Action (`version-and-tag.yml`) will detect the push, calculate the new version, and push a new package tag (e.g., `nabu-fedora-configs-core-v1.2.0`). This new tag will, in turn, trigger the `create-release-tarballs.yml` workflow to create a GitHub Release and trigger a COPR build.
 
-3.  **Source Packaging**: For each package listed in `release-tarballs.txt`, the workflow runs `git archive` to create a clean source tarball (`.tar.gz`). This tarball contains only the files from that specific package's subdirectory, which is ideal for RPM building.
+#### 2. Manually Versioned (Upstream-Tracking) Packages
 
-4.  **GitHub Release**: The workflow then creates a new GitHub Release corresponding to the Git tag.
+These packages track an external upstream source. Their `Version` should match the upstream version, and local packaging changes are tracked by the `Release` number.
 
-5.  **Upload Assets**: Finally, all the generated source tarballs are uploaded as assets to the newly created GitHub Release.
+- `kernel-sm8150`
+- `xiaomi-nabu-firmware`
 
-The `.spec` files within each package are configured to use these uploaded tarballs as their `Source0`, allowing COPR to build them automatically.
+**Release Process:**
 
-### How to Create a New Release
-
-To publish a new version of all packages, simply create and push a new tag:
-
-```bash
-# Example for releasing version 0.1
-git tag -a v0.1 -m "Release version 0.1"
-git push origin v0.1
-```
-
-The GitHub Actions workflow will handle the rest.
-
-## How to Add a New Package
-
-Adding a new package to the automated release process is straightforward:
-
-1.  **Create the Directory**: Add a new directory for your package in the repository root (e.g., `my-new-package/`).
-
-2.  **Add Package Files**: Place all necessary source files and the `.spec` file inside this new directory. Ensure the `.spec` file's `Source0` points to the future GitHub Release asset, like so:
-    ```spec
-    Source0: https://github.com/jhuang6451/nabu_fedora_packages/releases/download/v%{version}/%{name}-%{version}.tar.gz
+1.  **Manually edit the `.spec` file** inside the package directory.
+    - To follow a new upstream release, update the `Version` field.
+    - For local packaging fixes, increment the `Release` field.
+2.  **Update the `%changelog`** in the `.spec` file with a description of the changes.
+3.  **Commit** the changes to the `.spec` file.
+4.  **Manually create and push a Git tag** that matches the package name and the `Version` from the spec file.
+    ```bash
+    # Example for a new kernel version
+    git tag kernel-sm8150-v6.17.0
+    git push origin kernel-sm8150-v6.17.0
     ```
+5.  The push of this new tag will trigger the `create-release-tarballs.yml` workflow to create a GitHub Release and trigger a COPR build.
 
-3.  **Update Package List**: Add the name of the new directory (`my-new-package`) to a new line in the `release-tarballs.txt` file.
+### Controlling Files
 
-4.  **Commit and Push**: Commit the new files and the changes to `release-tarballs.txt`.
-
-The next time a release is created, your new package will be automatically included in the process.
+- `release-tarballs.txt`: A list of all package directories managed by this repository.
+- `.no-auto-version`: A list of packages to be excluded from the automatic versioning process (i.e., the Manually Versioned packages).

@@ -1,7 +1,7 @@
 %global debug_package %{nil}
 
 Name:           nabu-fedora-configs-gnome
-Version:        0.2
+Version:        %{version}
 Release:        1%{?dist}
 Summary:        Configurations for Fedora for Nabu Gnome builds
 License:        MIT

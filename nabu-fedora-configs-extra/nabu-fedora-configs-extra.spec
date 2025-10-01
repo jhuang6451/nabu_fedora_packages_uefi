@@ -28,17 +28,19 @@ This package contains extra configuration files for running Fedora on the Xiaomi
 # We copy them directly into the buildroot.
 cp -a etc %{buildroot}/
 cp -a var %{buildroot}/
+cp -a usr %{buildroot}/
 
 %files
 %attr(644, root, root) %config(noreplace) %{_sysconfdir}/environment.d/99-im.conf
 %attr(644, root, root) %config(noreplace) %{_sysconfdir}/locale.conf
-%attr(644, root, root) %config(noreplace) %{_sysconfdir}/systemd/system/qbootctl.service
+%attr(644, root, root) %{_prefix}/lib/systemd/system/qbootctl.service
 %attr(644, root, root) %config(noreplace) %{_sysconfdir}/systemd/zram-generator.conf
 %attr(644, root, root) %config(noreplace) %{_sharedstatedir}/gdm/.config/monitors.xml
+%attr(644, root, root) %{_presetdir}/81-nabu-extra.preset
 
 %post
 
-%systemd_post qbootctl.service
+%systemd_post
 
 %preun
 %systemd_preun qbootctl.service

@@ -27,19 +27,21 @@ This package contains the essential configuration files for running Fedora on th
 # The source tarball contains the etc directory with the correct structure.
 # We copy it directly into the buildroot.
 cp -a etc %{buildroot}/
+cp -a usr %{buildroot}/
 
 %files
 %attr(644, root, root) %config(noreplace) %{_sysconfdir}/dracut.conf.d/99-nabu-generic.conf
 %attr(644, root, root) %config(noreplace) %{_sysconfdir}/fstab
 %attr(644, root, root) %config(noreplace) %{_sysconfdir}/systemd/ukify.conf
-%attr(644, root, root) %config(noreplace) %{_sysconfdir}/systemd/system/ath10k-shutdown.service
-%attr(644, root, root) %config(noreplace) %{_sysconfdir}/udev/rules.d/99-force-rtc1.rules
+%attr(644, root, root) %{_prefix}/lib/systemd/system/ath10k-shutdown.service
+%attr(644, root, root) %{_prefix}/lib/udev/rules.d/99-force-rtc1.rules
+%attr(644, root, root) %{_presetdir}/80-nabu-core.preset
 
 %post
 # Create the EFI directory as a mount point for the ESP.
 # This is required for UKI generation and bootloader installation.
 mkdir -p /boot/efi
-%systemd_post ath10k-shutdown.service rmtfs.service tqftpserv.service
+%systemd_post
 
 %preun
 %systemd_preun ath10k-shutdown.service rmtfs.service tqftpserv.service

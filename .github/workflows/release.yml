@@ -30,7 +30,7 @@ jobs:
           for pkg in ${PACKAGES_LIST}; do
             echo "--- Processing package: ${pkg} ---"
 
-            if [ -f .no-auto-version ] && grep -qx "${pkg}" .no-auto-version;
+            if [ -f .no-auto-version ] && grep -qx "${pkg}" .no-auto-version; then
               echo "Skipping ${pkg} as it is in the auto-version ignore list."
               continue
             fi

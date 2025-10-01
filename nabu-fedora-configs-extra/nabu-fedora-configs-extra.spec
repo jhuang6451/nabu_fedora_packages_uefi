@@ -1,7 +1,7 @@
 %global debug_package %{nil}
 
 Name:           nabu-fedora-configs-extra
-Version:        0.7
+Version:        0.8
 Release:        1%{?dist}
 Summary:        Extra configuration files for Fedora on Xiaomi Pad 5 (nabu)
 License:        MIT
@@ -12,7 +12,6 @@ BuildRequires:  systemd-rpm-macros
 Requires:       fcitx5
 Requires:       qbootctl
 Requires:       zram-generator
-Requires:       gdm
 
 %description
 This package contains extra configuration files for running Fedora on the Xiaomi Pad 5 (nabu), such as display, input method, and performance tweaks

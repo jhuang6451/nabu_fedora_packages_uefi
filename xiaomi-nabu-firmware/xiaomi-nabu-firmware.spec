@@ -1,8 +1,8 @@
 Name:           xiaomi-nabu-firmware
 Version:        1
 Release:        1%{?dist}
-Summary:        Firmware for mipad5
-License:        Unknown
+Summary:        Firmware for running linux on Xiaomi Pad 5 (Nabu)
+License:        MIT
 URL:            https://gitlab.postmarketos.org/panpanpanpan/nabu-firmware
 Source0:        %{url}/-/archive/%{version}/nabu-firmware-%{version}.tar.gz
 BuildArch:     aarch64
@@ -11,7 +11,7 @@ Requires:       qcom-firmware
 %global _firmwaredir %{_prefix}/lib/firmware
 
 %description
-Firmware for mipad5
+Firmware for running linux on Xiaomi Pad 5 (Nabu)
 
 %prep
 %autosetup -n nabu-firmware-%{version}

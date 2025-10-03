@@ -1,7 +1,7 @@
 %global debug_package %{nil}
 
 Name:           nabu-fedora-configs-extra
-Version:        0.1
+Version:        1.1
 Release:        1%{?dist}
 Summary:        Extra configuration files for Fedora on Xiaomi Pad 5 (nabu)
 License:        MIT
@@ -42,5 +42,5 @@ cp -a usr %{buildroot}/
 %systemd_postun_with_restart qbootctl.service
 
 %changelog
-* Tue Sep 30 2025 jhuang6451 <xplayerhtz123@outlook.com> - 0.1-1
+* Tue Sep 30 2025 jhuang6451 <xplayerhtz123@outlook.com> - 1.1-1
 - Initial release

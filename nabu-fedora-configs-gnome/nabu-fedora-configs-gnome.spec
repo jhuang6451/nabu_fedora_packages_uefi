@@ -1,7 +1,7 @@
 %global debug_package %{nil}
 
 Name:           nabu-fedora-configs-gnome
-Version:        0.1
+Version:        1.1
 Release:        1%{?dist}
 Summary:        Configurations for Fedora for Nabu Gnome builds
 License:        MIT
@@ -25,5 +25,5 @@ cp -a var %{buildroot}/
 %attr(644, gdm, gdm) %config(noreplace) %{_sharedstatedir}/gdm/.config/monitors.xml
 
 %changelog
-* Wed Oct 01 2025 jhuang6451 <xplayerhtz123@outlook.com> - 0.1-1
+* Wed Oct 01 2025 jhuang6451 <xplayerhtz123@outlook.com> - 1.1-1
 - Initial release

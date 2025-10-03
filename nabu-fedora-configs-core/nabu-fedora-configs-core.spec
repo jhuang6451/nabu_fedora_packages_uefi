@@ -1,7 +1,7 @@
 %global debug_package %{nil}
 
 Name:           nabu-fedora-configs-core
-Version:        0.2
+Version:        1.2
 Release:        2%{?dist}
 Summary:        Core, audio and branding configuration files for Fedora on Xiaomi Pad 5 (nabu)
 License:        MIT
@@ -60,11 +60,11 @@ fi
 %systemd_postun_with_restart ath10k-shutdown.service rmtfs.service tqftpserv.service
 
 %changelog
-* Tue Dec 4 2025 jhuang6451 <xplayerhtz123@outlook.com> - 0.2-2
+* Tue Dec 4 2025 jhuang6451 <xplayerhtz123@outlook.com> - 1.2-2
 - Removed "os-release".
 
-* Tue Sep 30 2025 jhuang6451 <xplayerhtz123@outlook.com> - 0.2-1
+* Tue Sep 30 2025 jhuang6451 <xplayerhtz123@outlook.com> - 1.2-1
 - Added services, move os-release to a seperate package.
 
-* Tue Sep 30 2025 jhuang6451 <xplayerhtz123@outlook.com> - 0.1-1
+* Tue Sep 30 2025 jhuang6451 <xplayerhtz123@outlook.com> - 1.1-1
 - Initial release

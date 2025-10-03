@@ -12,76 +12,51 @@ jobs:
   detect-changes:
     runs-on: ubuntu-latest
     outputs:
-      # 输出一个 JSON 字符串，其中包含所有版本已更改的包
       changed_packages: ${{ steps.check_version.outputs.changed_packages }}
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
         with:
-          # 确保检出的是触发工作流的分支
           ref: ${{ github.ref_name }}
-          # 获取足够的提交历史记录以进行比较
           fetch-depth: 2
 
       - name: Check for version changes in all packages
         id: check_version
         run: |
-          # 检查 .release-tarballs 文件是否存在
           if [ ! -f .release-tarballs ]; then
             echo ".release-tarballs file not found!"
             exit 1
           fi
-
-          # 初始化一个空的 JSON 数组
           changed_packages="[]"
-
-          # 逐行读取 .release-tarballs 文件
           while IFS= read -r pkg_name || [[ -n "$pkg_name" ]]; do
-            # 跳过空行
             if [ -z "$pkg_name" ]; then
               continue
             fi
-            
             echo "Checking package: $pkg_name"
             SPEC_FILE="${pkg_name}/${pkg_name}.spec"
-
-            # 检查 spec 文件是否存在
             if [ ! -f "$SPEC_FILE" ]; then
               echo "Spec file not found for $pkg_name at $SPEC_FILE. Skipping."
               continue
             fi
-
-            # 从当前 HEAD 提取版本号
             VERSION=$(grep -m 1 '^Version:' "$SPEC_FILE" | awk '{print $2}')
-            
-            # 从上一个提交 (HEAD~1) 提取版本号
-            # 如果文件在上一个提交中不存在或 grep 失败，则将 PREV_VERSION 设为 "0"
             PREV_VERSION=$(git show HEAD~1:"$SPEC_FILE" 2>/dev/null | grep -m 1 '^Version:' | awk '{print $2}' || echo "0")
-            
             echo "Current version: $VERSION"
             echo "Previous version: $PREV_VERSION"
-            
-            # 比较版本号
             if [ "$VERSION" != "$PREV_VERSION" ] && [ -n "$VERSION" ]; then
               echo "Version changed for $pkg_name: $PREV_VERSION -> $VERSION"
-              # 将更新的包名和版本添加到 JSON 数组中
               changed_packages=$(echo "$changed_packages" | jq -c --arg name "$pkg_name" --arg ver "$VERSION" '. + [{"name": $name, "version": $ver}]')
+            else
               echo "Version has not changed for $pkg_name."
             fi
           done < .release-tarballs
-
-          # 将最终的 JSON 数组设置为 step 的输出
           echo "changed_packages=${changed_packages}" >> $GITHUB_OUTPUT
 
   release:
     needs: detect-changes
-    # 只有在检测到有包更新时才运行此作业
     if: fromJson(needs.detect-changes.outputs.changed_packages)[0] != null
     runs-on: ubuntu-latest
-    # 使用 matrix 策略为每个更新的包并行创建一个 release
     strategy:
       matrix:
-        # 从上一个作业的输出中解析 JSON 数组
         package: ${{ fromJson(needs.detect-changes.outputs.changed_packages) }}
     steps:
       - name: Checkout code
@@ -94,21 +69,11 @@ jobs:
           VERSION="${{ matrix.package.version }}"
           DIR_NAME="${PKG_NAME}-${VERSION}"
           TARBALL_NAME="${DIR_NAME}.tar.gz"
-          
           echo "Packaging $PKG_NAME version $VERSION"
-          
-          # 将软件包目录重命名为包含版本的格式，以便打包
           mv "$PKG_NAME" "$DIR_NAME"
-          
-          # 创建 tarball
-          # 使用 --exclude-vcs 排除 .git 等版本控制目录
           tar --exclude-vcs -czvf "$TARBALL_NAME" "$DIR_NAME"
-          
-          # 将目录重命名回来，以保持工作区的清洁
           mv "$DIR_NAME" "$PKG_NAME"
-          
           echo "Created tarball: $TARBALL_NAME"
-          # 将 tarball 的名称设置为 step 的输出，以便下一步使用
           echo "tarball_name=$TARBALL_NAME" >> $GITHUB_OUTPUT
 
       - name: Create GitHub Release for ${{ matrix.package.name }}
@@ -120,6 +85,14 @@ jobs:
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
+  trigger-copr-build:
+    needs: [detect-changes, release]
+    if: fromJson(needs.detect-changes.outputs.changed_packages)[0] != null
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        package: ${{ fromJson(needs.detect-changes.outputs.changed_packages) }}
+    steps:
       - name: Trigger Copr Build for ${{ matrix.package.name }}
         uses: docker://fedora:latest
         env:
@@ -129,18 +102,11 @@ jobs:
           COPR_URL: ${{ secrets.COPR_API_URL }}
           COPR_PROJECT: ${{ secrets.COPR_PROJECT }}
         with:
-          # 明确指定入口点为 bash
           entrypoint: /bin/bash
-          # args 传递给 entrypoint。整个脚本被包裹在一对单引号中。
-          # 脚本内部绝对不能出现未转义的单引号。
           args: -c '
-            set -e # 如果任何命令失败，立即退出脚本
-
-            # 步骤1：安装 copr-cli 客户端
+            set -e
             echo "Installing copr-cli..."
-            dnf install copr-cli -y
-
-            # 步骤2：配置认证信息
+            dnf install -y copr-cli
             echo "Configuring copr-cli authentication..."
             mkdir -p ~/.config
             cat <<EOF > ~/.config/copr
@@ -150,22 +116,14 @@ jobs:
             token = $COPR_TOKEN
             copr_url = $COPR_URL
             EOF
-
-            # 步骤3：验证身份
             echo "Verifying copr identity..."
             copr-cli whoami
-
-            # 步骤5：准备构建参数
-            # 确保替换为您正确的 GitHub 仓库地址
             CLONE_URL="https://github.com/jhuang6451/nabu_fedora_packages.git"
             COMMITTISH="release"
             SUBDIRECTORY="${{ matrix.package.name }}"
             SPEC="${{ matrix.package.name }}.spec"
             COPR_REPO="nabu_fedora_packages"
-
-            echo "Triggering Copr build in repo ${COPR_REPO}..."
-
-            # 触发构建
+            echo "Triggering Copr build in repo ${COPR_REPO} for package ${SUBDIRECTORY}..."
             copr-cli buildscm \
             --clone-url "${CLONE_URL}" \
             --commit "${COMMITTISH}" \

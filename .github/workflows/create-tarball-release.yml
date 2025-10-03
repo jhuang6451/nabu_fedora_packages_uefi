@@ -1,9 +1,9 @@
-name: Release Updated Packages
+name: Create Tarball for Updated Packages (Release)
 
 on:
   push:
     branches:
-      - "exp"
+      - "release"
     paths:
       - '**/*.spec'
       - '.release-tarballs'

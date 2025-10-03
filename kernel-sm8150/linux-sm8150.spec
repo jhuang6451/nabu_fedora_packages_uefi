@@ -142,25 +142,25 @@ if [ "$1" -eq 0 ] ; then
 fi
 
 %changelog
-* Thu Sep 25 2025 jhuang6451 <xplayerhtz123@outlook.com> - 6.16.0-4.sm8150
+* Thu Sep 25 2025 jhuang6451 <xplayerhtz123@outlook.com> - 6.16-4.sm8150
 - Switched UKI generation to a dracut + systemd-ukify two-step process.
 - dracut is now only responsible for creating the initramfs.
 - systemd-ukify is used to assemble the kernel, initramfs, cmdline, and DTB into the final UKI.
 
-* Thu Sep 25 2025 jhuang6451 <xplayerhtz123@outlook.com> - 6.16.0-3.sm8150
+* Thu Sep 25 2025 jhuang6451 <xplayerhtz123@outlook.com> - 6.16-3.sm8150
 - Replaced `kernel-install` with a direct `dracut` call in %posttrans scriptlet.
 - This fixes a critical bug where the device tree (DTB) was not being
   included in the generated UKI, ensuring the kernel is bootable.
 
-* Sat Sep 20 2025 jhuang6451 <xplayerhtz123@outlook.com> - 6.16.0-2.sm8150
+* Sat Sep 20 2025 jhuang6451 <xplayerhtz123@outlook.com> - 6.16-2.sm8150
 - Aligned post-install script with kernel-install framework for consistent UKI generation.
 - Removed redundant dracut call from %posttrans.
 
-* Sat Sep 13 2025 jhuang6451 <xplayerhtz123@outlook.com> - 6.16.0-1.sm8150
+* Sat Sep 13 2025 jhuang6451 <xplayerhtz123@outlook.com> - 6.16-1.sm8150
 - Modified spec for standard Fedora systems, removing ostree logic.
 - Adopted standard file paths (/boot) and kernel-install for UEFI/bootloader integration.
 
-* Fri Sep 12 2025 jhuang6451 <xplayerhtz123@outlook.com> - 6.16.0-0.sm8150
+* Fri Sep 12 2025 jhuang6451 <xplayerhtz123@outlook.com> - 6.16-0.sm8150
 - Added post-transaction script to copy kernel and DTB to ESP for UEFI boot.
 
 * Fri Jul 25 2025 gmanka 6.16.0

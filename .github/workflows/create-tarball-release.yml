@@ -120,15 +120,7 @@ jobs:
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
-  trigger-copr-build:
-    needs: [detect-changes, release]
-    if: fromJson(needs.detect-changes.outputs.changed_packages)[0] != null
-    runs-on: ubuntu-latest
-    # 使用 release 作业的输出作为 matrix 的输入
-    strategy:
-      matrix:
-        package: ${{ fromJson(needs.detect-changes.outputs.changed_packages) }}
-    steps:
+steps:
       - name: Trigger Copr Build for ${{ matrix.package.name }}
         uses: docker://fedora:latest
         env:
@@ -138,42 +130,50 @@ jobs:
           COPR_URL: ${{ secrets.COPR_API_URL }}
           COPR_PROJECT: ${{ secrets.COPR_PROJECT }}
         with:
-          args: |
-            bash -c '
-              # 步骤1：安装 copr-cli 客户端
-              echo "Installing copr-cli..."
-              sudo dnf install copr-cli
+          # 明确指定入口点为 bash
+          entrypoint: /bin/bash
+          # args 传递给 entrypoint。整个脚本被包裹在一对单引号中。
+          # 脚本内部绝对不能出现未转义的单引号。
+          args: -c '
+            set -e # 如果任何命令失败，立即退出脚本
 
-              # 步骤2：根据 man page 的 "Authentication" 部分配置认证信息
-              echo "Configuring copr-cli authentication..."
-              mkdir -p ~/.config
-              cat <<EOF > ~/.config/copr
-              [copr-cli]
-              login = $COPR_LOGIN
-              username = $COPR_USERNAME
-              token = $COPR_TOKEN
-              copr_url = $COPR_URL
-              EOF
+            # 步骤1：安装 copr-cli 客户端
+            echo "Installing copr-cli..."
+            dnf install copr-cli -y
 
-              # 步骤3：验证身份
-              echo "Verifying copr identity..."
-              copr-cli whoami
+            # 步骤2：配置认证信息
+            echo "Configuring copr-cli authentication..."
+            mkdir -p ~/.config
+            cat <<EOF > ~/.config/copr
+            [copr-cli]
+            login = $COPR_LOGIN
+            username = $COPR_USERNAME
+            token = $COPR_TOKEN
+            copr_url = $COPR_URL
+            EOF
 
-              # 步骤5：触发构建
-              CLONE_URL="https://github.com/jhuang6451/nabu_fedora_packages.git"
-              COMMITTISH="release"
-              SUBDIRECTORY="${{ matrix.package.name }}"
-              SPEC="${{ matrix.package.name }}.spec"
-              COPR_REPO="nabu_fedora_packages"
+            # 步骤3：验证身份
+            echo "Verifying copr identity..."
+            copr-cli whoami
 
-              echo "Triggering Copr build in repo ${COPR_REPO}...""
-              copr-cli buildscm \
-              --clone-url ${CLONE_URL} \
-              --commit ${COMMITTISH} \
-              --subdir ${SUBDIRECTORY} \
-              --spec ${SPEC} \
-              --type git \
-              --method rpkg \
-              --nowait \
-              ${COPR_REPO}
+            # 步骤5：准备构建参数
+            # 确保替换为您正确的 GitHub 仓库地址
+            CLONE_URL="https://github.com/jhuang6451/nabu_fedora_packages.git"
+            COMMITTISH="release"
+            SUBDIRECTORY="${{ matrix.package.name }}"
+            SPEC="${{ matrix.package.name }}.spec"
+            COPR_REPO="nabu_fedora_packages"
+
+            echo "Triggering Copr build in repo ${COPR_REPO}..."
+
+            # 触发构建
+            copr-cli buildscm \
+            --clone-url "${CLONE_URL}" \
+            --commit "${COMMITTISH}" \
+            --subdir "${SUBDIRECTORY}" \
+            --spec "${SPEC}" \
+            --type git \
+            --method rpkg \
+            --nowait \
+            "${COPR_REPO}"
             '

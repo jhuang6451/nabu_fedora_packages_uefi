@@ -1,22 +1,12 @@
 %global debug_package %{nil}
 
 Name:           nabu-fedora-configs-core
-Version:        0.1
+Version:        0.11
 Release:        1%{?dist}
 Summary:        Core, audio and branding configuration files for Fedora on Xiaomi Pad 5 (nabu)
 License:        MIT
-URL:            https://github.com/jhuang6451/nabu-fedora
-Source0:        etc/dracut.conf.d/99-nabu-generic.conf
-Source1:        etc/fstab
-Source2:        etc/systemd/ukify.conf
-Source3:        etc/pulse/daemon.conf.d/89-xiaomi_nabu.conf
-Source4:        etc/pulse/default.pa.d/nabu.pa
-Source5:        etc/os-release
-Source6:        usr/lib/systemd/system-preset/80-nabu-core.preset
-Source7:        usr/lib/systemd/system/ath10k-shutdown.service
-Source8:        usr/lib/udev/rules.d/99-force-rtc1.rules
-Source9:        usr/share/alsa/ucm2/conf.d/sm8150/sm8150.conf
-Source10:       usr/share/alsa/ucm2/Xiaomi/nabu/HiFi.conf
+URL:            https://github.com/jhuang6451/nabu_fedora
+Source0:        https://github.com/jhuang6451/nabu_fedora_packages/releases/download/%{name}-%{version}/%{name}-%{version}.tar.gz
 BuildArch:      noarch
 BuildRequires:  systemd-rpm-macros
 Requires:       dracut

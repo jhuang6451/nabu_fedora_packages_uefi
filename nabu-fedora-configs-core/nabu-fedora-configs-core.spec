@@ -1,8 +1,8 @@
 %global debug_package %{nil}
 
 Name:           nabu-fedora-configs-core
-Version:        0.16
-Release:        1%{?dist}
+Version:        1.1
+Release:        2%{?dist}
 Summary:        Core, audio and branding configuration files for Fedora on Xiaomi Pad 5 (nabu)
 License:        MIT
 URL:            https://github.com/jhuang6451/nabu_fedora
@@ -30,7 +30,6 @@ cp -a etc %{buildroot}/
 cp -a usr %{buildroot}/
 
 %files
-%attr(644, root, root) %config(noreplace) %{_sysconfdir}/os-release-tmp/os-release
 %attr(644, root, root) %config(noreplace) %{_sysconfdir}/dracut.conf.d/99-nabu-generic.conf
 %attr(644, root, root) %config(noreplace) %{_sysconfdir}/fstab
 %attr(644, root, root) %config(noreplace) %{_sysconfdir}/systemd/ukify.conf
@@ -46,10 +45,6 @@ cp -a usr %{buildroot}/
 # Create the EFI directory as a mount point for the ESP.
 # This is required for UKI generation and bootloader installation.
 mkdir -p /boot/efi
-# Overwrite /etc/os-release with the custom version after installation
-# This avoids a file conflict at the RPM database level.
-rm /etc/os-release
-cp %{_datadir}/os-release-tmp/os-release /etc/os-release
 
 %systemd_post ath10k-shutdown.service
 
@@ -65,8 +60,11 @@ fi
 %systemd_postun_with_restart ath10k-shutdown.service rmtfs.service tqftpserv.service
 
 %changelog
-* Tue Sep 30 2025 jhuang6451 <xplayerhtz123@outlook.com> - 0.2-1
+* Tue Dec 4 2025 jhuang6451 <xplayerhtz123@outlook.com> - 1.1-2
+- Removed "os-release".
+
+* Tue Sep 30 2025 jhuang6451 <xplayerhtz123@outlook.com> - 1.1-1
 - Added services, move os-release to a seperate package.
 
-* Tue Sep 30 2025 jhuang6451 <xplayerhtz123@outlook.com> - 0.1-1
+* Tue Sep 30 2025 jhuang6451 <xplayerhtz123@outlook.com> - 1.0-1
 - Initial release

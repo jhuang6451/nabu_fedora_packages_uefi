@@ -30,7 +30,7 @@ cp -a etc %{buildroot}/
 cp -a usr %{buildroot}/
 
 %files
-%attr(644, root, root) %config(noreplace) %{_sysconfdir}/os-release
+%attr(644, root, root) %config(noreplace) %{_sysconfdir}/os-release-tmp/os-release
 %attr(644, root, root) %config(noreplace) %{_sysconfdir}/dracut.conf.d/99-nabu-generic.conf
 %attr(644, root, root) %config(noreplace) %{_sysconfdir}/fstab
 %attr(644, root, root) %config(noreplace) %{_sysconfdir}/systemd/ukify.conf
@@ -46,10 +46,19 @@ cp -a usr %{buildroot}/
 # Create the EFI directory as a mount point for the ESP.
 # This is required for UKI generation and bootloader installation.
 mkdir -p /boot/efi
+# Overwrite /etc/os-release with the custom version after installation
+# This avoids a file conflict at the RPM database level.
+cp %{_datadir}/os-release-tmp/os-release /etc/os-release
+
 %systemd_post ath10k-shutdown.service
 
 %preun
 %systemd_preun ath10k-shutdown.service rmtfs.service tqftpserv.service
+# If the package is being uninstalled, restore the original os-release symlink
+if [ $1 -eq 0 ] ; then
+    rm -f /etc/os-release
+    ln -s /usr/lib/os-release /etc/os-release
+fi
 
 %postun
 %systemd_postun_with_restart ath10k-shutdown.service rmtfs.service tqftpserv.service

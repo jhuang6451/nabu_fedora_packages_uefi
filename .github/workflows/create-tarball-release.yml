@@ -119,3 +119,60 @@ jobs:
           name: Release ${{ matrix.package.name }} ${{ matrix.package.version }}
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+  trigger-copr-build:
+    needs: release
+    runs-on: ubuntu-latest
+    # 使用 release 作业的输出作为 matrix 的输入
+    strategy:
+      matrix:
+        package: ${{ fromJson(needs.release.outputs.packages_to_build) }}
+    steps:
+      - name: Trigger Copr Build for ${{ matrix.package.name }}
+        uses: docker://fedora:latest
+        env:
+          COPR_LOGIN: ${{ secrets.COPR_LOGIN }}
+          COPR_USERNAME: ${{ secrets.COPR_USERNAME }}
+          COPR_TOKEN: ${{ secrets.COPR_TOKEN }}
+          COPR_URL: ${{ secrets.COPR_API_URL }}
+          COPR_PROJECT: ${{ secrets.COPR_PROJECT }}
+        with:
+          args: |
+            bash -c '
+              # 步骤1：安装 copr-cli 客户端
+              echo "Installing copr-cli..."
+              sudo dnf install copr-cli
+
+              # 步骤2：根据 man page 的 "Authentication" 部分配置认证信息
+              echo "Configuring copr-cli authentication..."
+              mkdir -p ~/.config
+              cat <<EOF > ~/.config/copr
+              [copr-cli]
+              login = $COPR_LOGIN
+              username = $COPR_USERNAME
+              token = $COPR_TOKEN
+              copr_url = $COPR_URL
+              EOF
+
+              # 步骤3：验证身份
+              echo "Verifying copr identity..."
+              copr-cli whoami
+
+              # 步骤5：触发构建
+              CLONE_URL="https://github.com/jhuang6451/nabu_fedora_packages.git"
+              COMMITTISH="release"
+              SUBDIRECTORY="${{ matrix.package.name }}"
+              SPEC="${{ matrix.package.name }}.spec"
+              COPR_REPO="nabu_fedora_packages"
+
+              echo "Triggering Copr build in repo '${COPR_REPO}'..."
+              copr-cli buildscm \
+              --clone-url ${CLONE_URL} \
+              --commit ${COMMITTISH} \
+              --subdir ${SUBDIRECTORY} \
+              --spec ${SPEC} \
+              --type git \
+              --method rpkg \
+              --nowait \
+              ${COPR_REPO}
+            '

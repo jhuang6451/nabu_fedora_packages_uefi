@@ -3,7 +3,7 @@ name: Release nabu-fedora-dualboot-efi
 on:
   push:
     branches:
-      - "6.16"
+      - "exp"
     paths:
       - 'nabu-fedora-dualboot-efi/nabu-fedora-dualboot-efi.spec'
 

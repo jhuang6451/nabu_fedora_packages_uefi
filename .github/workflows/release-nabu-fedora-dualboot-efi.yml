@@ -4,6 +4,9 @@ on:
   push:
     branches:
       - "exp"
+    paths:
+      - '**/*.spec'
+      - '.release-tarballs'
 
 jobs:
   detect-changes:
@@ -60,8 +63,7 @@ jobs:
             if [ "$VERSION" != "$PREV_VERSION" ] && [ -n "$VERSION" ]; then
               echo "Version changed for $pkg_name: $PREV_VERSION -> $VERSION"
               # 将更新的包名和版本添加到 JSON 数组中
-              changed_packages=$(echo "$changed_packages" | jq --arg name "$pkg_name" --arg ver "$VERSION" '. + [{"name": $name, "version": $ver}]')
-            else
+              changed_packages=$(echo "$changed_packages" | jq -c --arg name "$pkg_name" --arg ver "$VERSION" '. + [{"name": $name, "version": $ver}]')
               echo "Version has not changed for $pkg_name."
             fi
           done < .release-tarballs

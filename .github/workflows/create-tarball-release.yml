@@ -166,7 +166,7 @@ jobs:
               SPEC="${{ matrix.package.name }}.spec"
               COPR_REPO="nabu_fedora_packages"
 
-              echo "Triggering Copr build in repo '${COPR_REPO}'..."
+              echo "Triggering Copr build in repo ${COPR_REPO}...""
               copr-cli buildscm \
               --clone-url ${CLONE_URL} \
               --commit ${COMMITTISH} \

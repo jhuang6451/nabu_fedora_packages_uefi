@@ -85,7 +85,7 @@ jobs:
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
-  trigger-copr-build:
+trigger-copr-build:
     needs: [detect-changes, release]
     if: fromJson(needs.detect-changes.outputs.changed_packages)[0] != null
     runs-on: ubuntu-latest
@@ -101,13 +101,13 @@ jobs:
           COPR_TOKEN: ${{ secrets.COPR_TOKEN }}
           COPR_URL: ${{ secrets.COPR_API_URL }}
           COPR_PROJECT: ${{ secrets.COPR_PROJECT }}
-        with:
-          entrypoint: /bin/bash
-          args: -c '
+          SCRIPT: |
             set -e
-            echo "Installing copr-cli..."
+            
+            echo "--> Installing copr-cli..."
             dnf install -y copr-cli
-            echo "Configuring copr-cli authentication..."
+            
+            echo "--> Configuring copr-cli authentication..."
             mkdir -p ~/.config
             cat <<EOF > ~/.config/copr
             [copr-cli]
@@ -116,21 +116,27 @@ jobs:
             token = $COPR_TOKEN
             copr_url = $COPR_URL
             EOF
-            echo "Verifying copr identity..."
+            
+            echo "--> Verifying copr identity..."
             copr-cli whoami
+            
             CLONE_URL="https://github.com/jhuang6451/nabu_fedora_packages.git"
             COMMITTISH="release"
             SUBDIRECTORY="${{ matrix.package.name }}"
             SPEC="${{ matrix.package.name }}.spec"
             COPR_REPO="nabu_fedora_packages"
-            echo "Triggering Copr build in repo ${COPR_REPO} for package ${SUBDIRECTORY}..."
+            
+            echo "--> Triggering Copr build in repo '${COPR_REPO}' for package '${SUBDIRECTORY}'..."
             copr-cli buildscm \
-            --clone-url "${CLONE_URL}" \
-            --commit "${COMMITTISH}" \
-            --subdir "${SUBDIRECTORY}" \
-            --spec "${SPEC}" \
-            --type git \
-            --method rpkg \
-            --nowait \
-            "${COPR_REPO}"
-            '
+              --clone-url "${CLONE_URL}" \
+              --commit "${COMMITTISH}" \
+              --subdir "${SUBDIRECTORY}" \
+              --spec "${SPEC}" \
+              --type git \
+              --method rpkg \
+              --nowait \
+              "${COPR_REPO}"
+
+        with:
+          entrypoint: /bin/bash
+          args: -c "$SCRIPT"

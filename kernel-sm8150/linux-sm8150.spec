@@ -1,7 +1,7 @@
 %undefine        _debugsource_packages
 %global tag      6.16
 Version:         6.16
-Release:         4.sm8150%{?dist}
+Release:         5.sm8150%{?dist}
 ExclusiveArch:   aarch64
 Name:            kernel-sm8150
 Summary:         Mainline Linux kernel for sm8150 devices
@@ -83,7 +83,7 @@ depmod -a "${uname_r}"
 echo "--- Generating UKI for ${uname_r} using dracut + ukify ---"
 
 # --- 定义路径 ---
-UKI_DIR="/boot/efi/EFI/Linux"
+UKI_DIR="/boot/efi/EFI/fedora"
 INITRD_PATH="/boot/initramfs-${uname_r}.img"
 KERNEL_PATH="/boot/vmlinuz-${uname_r}"
 DTB_PATH="/usr/lib/modules/${uname_r}/dtb/qcom/sm8150-xiaomi-nabu.dtb"
@@ -142,6 +142,9 @@ if [ "$1" -eq 0 ] ; then
 fi
 
 %changelog
+* Thu Dec 4 2025 jhuang6451 <xplayerhtz123@outlook.com> - 6.16-5.sm8150
+- Change UKI output directory to "/boot/efi/EFI/fedora".
+
 * Thu Sep 25 2025 jhuang6451 <xplayerhtz123@outlook.com> - 6.16-4.sm8150
 - Switched UKI generation to a dracut + systemd-ukify two-step process.
 - dracut is now only responsible for creating the initramfs.

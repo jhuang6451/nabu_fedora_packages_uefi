@@ -1,7 +1,7 @@
 %global debug_package %{nil}
 
 Name:           nabu-fedora-configs-extra
-Version:        0.12
+Version:        0.13
 Release:        1%{?dist}
 Summary:        Extra configuration files for Fedora on Xiaomi Pad 5 (nabu)
 License:        MIT
@@ -17,21 +17,14 @@ Requires:       zram-generator
 This package contains extra configuration files for running Fedora on the Xiaomi Pad 5 (nabu), such as display, input method, and performance tweaks
 
 %prep
-# No prep needed, using local files
+%autosetup
 
 %build
-# Nothing to build as we are just packaging files
+# Nothing to build
 
 %install
-install -d -m 755 %{buildroot}%{_sysconfdir}/environment.d
-install -m 644 %{SOURCE0} %{buildroot}%{_sysconfdir}/environment.d/99-im.conf
-install -m 644 %{SOURCE1} %{buildroot}%{_sysconfdir}/locale.conf
-install -d -m 755 %{buildroot}%{_sysconfdir}/systemd
-install -m 644 %{SOURCE2} %{buildroot}%{_sysconfdir}/systemd/zram-generator.conf
-install -d -m 755 %{buildroot}%{_presetdir}
-install -m 644 %{SOURCE3} %{buildroot}%{_presetdir}/81-nabu-extra.preset
-install -d -m 755 %{buildroot}%{_prefix}/lib/systemd/system
-install -m 644 %{SOURCE4} %{buildroot}%{_prefix}/lib/systemd/system/qbootctl.service
+cp -a etc %{buildroot}/
+cp -a usr %{buildroot}/
 
 %files
 %attr(644, root, root) %config(noreplace) %{_sysconfdir}/locale.conf

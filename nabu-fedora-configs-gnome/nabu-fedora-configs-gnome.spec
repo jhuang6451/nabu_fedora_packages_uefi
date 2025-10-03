@@ -1,7 +1,7 @@
 %global debug_package %{nil}
 
 Name:           nabu-fedora-configs-gnome
-Version:        0.12
+Version:        0.13
 Release:        1%{?dist}
 Summary:        Configurations for Fedora for Nabu Gnome builds
 License:        MIT
@@ -13,14 +13,13 @@ BuildArch:      noarch
 This package contains configurations specific for Fedora for Nabu builds with Gnome DE
 
 %prep
-# No prep needed, using local files
+%autosetup
 
 %build
 # Nothing to build
 
 %install
-install -d -m 755 %{buildroot}%{_sharedstatedir}/gdm/.config
-install -m 644 %{SOURCE0} %{buildroot}%{_sharedstatedir}/gdm/.config/monitors.xml
+cp -a var %{buildroot}/
 
 %files
 %attr(644, gdm, gdm) %config(noreplace) %{_sharedstatedir}/gdm/.config/monitors.xml

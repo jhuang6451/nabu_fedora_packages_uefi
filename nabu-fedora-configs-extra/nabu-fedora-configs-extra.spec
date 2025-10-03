@@ -11,6 +11,7 @@ BuildArch:      noarch
 BuildRequires:  systemd-rpm-macros
 Requires:       fcitx5
 Requires:       zram-generator
+Requires:       qbootctl
 
 %description
 This package contains extra configuration files for running Fedora on the Xiaomi Pad 5 (nabu), such as display, input method, and performance tweaks
@@ -23,11 +24,22 @@ This package contains extra configuration files for running Fedora on the Xiaomi
 
 %install
 cp -a etc %{buildroot}/
+cp -a usr %{buildroot}/
 
 %files
 %attr(644, root, root) %config(noreplace) %{_sysconfdir}/locale.conf
 %attr(644, root, root) %config(noreplace) %{_sysconfdir}/environment.d/99-im.conf
 %attr(644, root, root) %config(noreplace) %{_sysconfdir}/systemd/zram-generator.conf
+%attr(644, root, root) %{_presetdir}/81-qbootctl.preset
+
+%post
+%systemd_post qbootctl.service
+
+%preun
+%systemd_preun qbootctl.service
+
+%postun
+%systemd_postun_with_restart qbootctl.service
 
 %changelog
 * Tue Sep 30 2025 jhuang6451 <xplayerhtz123@outlook.com> - 0.4-1

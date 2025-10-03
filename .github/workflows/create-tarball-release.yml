@@ -18,6 +18,8 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v4
         with:
+          # 确保检出的是触发工作流的分支
+          ref: ${{ github.ref_name }}
           # 获取足够的提交历史记录以进行比较
           fetch-depth: 2
 

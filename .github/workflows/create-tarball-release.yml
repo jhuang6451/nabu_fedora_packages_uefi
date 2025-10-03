@@ -89,54 +89,29 @@ jobs:
     needs: [detect-changes, release]
     if: fromJson(needs.detect-changes.outputs.changed_packages)[0] != null
     runs-on: ubuntu-latest
+    container:
+      image: fedora:42
     strategy:
       matrix:
         package: ${{ fromJson(needs.detect-changes.outputs.changed_packages) }}
     steps:
+      - name: Checkout repository code
+        uses: actions/checkout@v4
+
       - name: Trigger Copr Build for ${{ matrix.package.name }}
-        uses: docker://fedora:latest
         env:
           COPR_LOGIN: ${{ secrets.COPR_LOGIN }}
           COPR_USERNAME: ${{ secrets.COPR_USERNAME }}
           COPR_TOKEN: ${{ secrets.COPR_TOKEN }}
           COPR_URL: ${{ secrets.COPR_API_URL }}
           COPR_PROJECT: ${{ secrets.COPR_PROJECT }}
-          SCRIPT: |
-            set -e
-            
-            echo "--> Installing copr-cli..."
-            dnf install -y copr-cli
-            
-            echo "--> Configuring copr-cli authentication..."
-            mkdir -p ~/.config
-            cat <<EOF > ~/.config/copr
-            [copr-cli]
-            login = $COPR_LOGIN
-            username = $COPR_USERNAME
-            token = $COPR_TOKEN
-            copr_url = $COPR_URL
-            EOF
-            
-            echo "--> Verifying copr identity..."
-            copr-cli whoami
-            
-            CLONE_URL="https://github.com/jhuang6451/nabu_fedora_packages.git"
-            COMMITTISH="release"
-            SUBDIRECTORY="${{ matrix.package.name }}"
-            SPEC="${{ matrix.package.name }}.spec"
-            COPR_REPO="nabu_fedora_packages"
-            
-            echo "--> Triggering Copr build in repo '${COPR_REPO}' for package '${SUBDIRECTORY}'..."
-            copr-cli buildscm \
-              --clone-url "${CLONE_URL}" \
-              --commit "${COMMITTISH}" \
-              --subdir "${SUBDIRECTORY}" \
-              --spec "${SPEC}" \
-              --type git \
-              --method rpkg \
-              --nowait \
-              "${COPR_REPO}"
 
-        with:
-          entrypoint: /bin/bash
-          args: -c "$SCRIPT"
+          # 脚本内部需要的构建参数
+          CLONE_URL: "https://github.com/jhuang6451/nabu_fedora_packages.git"
+          COMMITTISH: "release"
+          SUBDIRECTORY: ${{ matrix.package.name }}
+          SPEC: ${{ matrix.package.name }}.spec
+          COPR_REPO: "nabu_fedora_packages"
+        run: |
+          chmod +x ./scripts/trigger-copr-build.sh
+          ./scripts/trigger-copr-build.sh

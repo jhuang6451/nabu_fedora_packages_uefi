@@ -85,7 +85,7 @@ jobs:
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
-trigger-copr-build:
+  trigger-copr-build:
     needs: [detect-changes, release]
     if: fromJson(needs.detect-changes.outputs.changed_packages)[0] != null
     runs-on: ubuntu-latest

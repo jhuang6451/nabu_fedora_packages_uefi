@@ -48,6 +48,7 @@ cp -a usr %{buildroot}/
 mkdir -p /boot/efi
 # Overwrite /etc/os-release with the custom version after installation
 # This avoids a file conflict at the RPM database level.
+rm /etc/os-release
 cp %{_datadir}/os-release-tmp/os-release /etc/os-release
 
 %systemd_post ath10k-shutdown.service

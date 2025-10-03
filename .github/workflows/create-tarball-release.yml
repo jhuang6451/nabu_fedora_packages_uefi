@@ -120,7 +120,6 @@ jobs:
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
-steps:
       - name: Trigger Copr Build for ${{ matrix.package.name }}
         uses: docker://fedora:latest
         env:

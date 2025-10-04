@@ -1,7 +1,7 @@
 %global debug_package %{nil}
 
 Name:           nabu-fedora-configs-core
-Version:        0.2
+Version:        0.3
 Release:        2%{?dist}
 Summary:        Core, audio and branding configuration files for Fedora on Xiaomi Pad 5 (nabu)
 License:        MIT
@@ -14,7 +14,7 @@ Requires:       systemd-ukify
 Requires:       rmtfs
 Requires:       tqftpserv
 Requires:       alsa-ucm
-Requires:       fedora-release-common
+Requires:       qbootctl
 
 %description
 This package contains the essential core, audio, and branding configuration files for running Fedora on the Xiaomi Pad 5 (nabu)
@@ -33,9 +33,11 @@ cp -a usr %{buildroot}/
 %attr(644, root, root) %config(noreplace) %{_sysconfdir}/dracut.conf.d/99-nabu-generic.conf
 %attr(644, root, root) %config(noreplace) %{_sysconfdir}/fstab
 %attr(644, root, root) %config(noreplace) %{_sysconfdir}/systemd/ukify.conf
+%attr(644, root, root) %config(noreplace) %{_sysconfdir}/systemd/zram-generator.conf
 %attr(644, root, root) %{_prefix}/lib/systemd/system/ath10k-shutdown.service
 %attr(644, root, root) %{_prefix}/lib/udev/rules.d/99-force-rtc1.rules
 %attr(644, root, root) %{_presetdir}/80-nabu-core.preset
+%attr(644, root, root) %{_presetdir}/81-qbootctl.preset
 %attr(644, root, root) %{_datadir}/alsa/ucm2/conf.d/sm8150/sm8150.conf
 %attr(644, root, root) %{_datadir}/alsa/ucm2/Xiaomi/nabu/HiFi.conf
 %attr(644, root, root) %config(noreplace) %{_sysconfdir}/pulse/daemon.conf.d/89-xiaomi_nabu.conf
@@ -46,21 +48,19 @@ cp -a usr %{buildroot}/
 # This is required for UKI generation and bootloader installation.
 mkdir -p /boot/efi
 
-%systemd_post ath10k-shutdown.service
+%systemd_post ath10k-shutdown.service qbootctl.service
 
 %preun
-%systemd_preun ath10k-shutdown.service rmtfs.service tqftpserv.service
-# If the package is being uninstalled, restore the original os-release symlink
-if [ $1 -eq 0 ] ; then
-    rm -f /etc/os-release
-    ln -s /usr/lib/os-release /etc/os-release
-fi
+%systemd_preun ath10k-shutdown.service rmtfs.service tqftpserv.service qbootctl.service
 
 %postun
-%systemd_postun_with_restart ath10k-shutdown.service rmtfs.service tqftpserv.service
+%systemd_postun_with_restart ath10k-shutdown.service rmtfs.service tqftpserv.service qbootctl.service
 
 %changelog
-* Tue Dec 4 2025 jhuang6451 <xplayerhtz123@outlook.com> - 0.2-2
+* Tue Oct 4 2025 jhuang6451 <xplayerhtz123@outlook.com> - 0.3-2
+- Moved some configs from extra to core.
+
+* Tue Oct 4 2025 jhuang6451 <xplayerhtz123@outlook.com> - 0.2-2
 - Removed "os-release".
 
 * Tue Sep 30 2025 jhuang6451 <xplayerhtz123@outlook.com> - 0.2-1

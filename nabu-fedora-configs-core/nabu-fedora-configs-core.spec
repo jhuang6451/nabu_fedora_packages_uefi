@@ -1,7 +1,7 @@
 %global debug_package %{nil}
 
 Name:           nabu-fedora-configs-core
-Version:        0.3
+Version:        0.4
 Release:        2%{?dist}
 Summary:        Core, audio and branding configuration files for Fedora on Xiaomi Pad 5 (nabu)
 License:        MIT
@@ -15,9 +15,12 @@ Requires:       rmtfs
 Requires:       tqftpserv
 Requires:       alsa-ucm
 Requires:       qbootctl
+Requires:       plymouth
+Requires:       plymouth-plugin-script
+Requires:       plymouth-plugin-two-step
 
 %description
-This package contains the essential core, audio, and branding configuration files for running Fedora on the Xiaomi Pad 5 (nabu)
+This package contains the essential configuration files for running Fedora on the Xiaomi Pad 5 (nabu)
 
 %prep
 %autosetup
@@ -42,11 +45,18 @@ cp -a usr %{buildroot}/
 %attr(644, root, root) %{_datadir}/alsa/ucm2/Xiaomi/nabu/HiFi.conf
 %attr(644, root, root) %config(noreplace) %{_sysconfdir}/pulse/daemon.conf.d/89-xiaomi_nabu.conf
 %attr(644, root, root) %config(noreplace) %{_sysconfdir}/pulse/default.pa.d/nabu.pa
+%attr(644, root, root) %{_datadir}/plymouth/themes/fedora-mac-style.tar.xz
 
 %post
 # Create the EFI directory as a mount point for the ESP.
 # This is required for UKI generation and bootloader installation.
 mkdir -p /boot/efi
+# Unpack plymouth theme and set it as default
+if [ -f /usr/share/plymouth/themes/fedora-mac-style.tar.xz ]; then
+    tar -xf /usr/share/plymouth/themes/fedora-mac-style.tar.xz -C /usr/share/plymouth/themes/ || :
+    plymouth-set-default-theme -R fedora-mac-style || :
+fi
+
 
 %systemd_post ath10k-shutdown.service qbootctl.service
 
@@ -57,6 +67,9 @@ mkdir -p /boot/efi
 %systemd_postun_with_restart ath10k-shutdown.service rmtfs.service tqftpserv.service qbootctl.service
 
 %changelog
+* Tue Oct 4 2025 jhuang6451 <xplayerhtz123@outlook.com> - 0.4-2
+- Added plymouth theme and updated kernel cmdline.
+
 * Tue Oct 4 2025 jhuang6451 <xplayerhtz123@outlook.com> - 0.3-2
 - Moved some configs from extra to core.
 

@@ -1,24 +1,24 @@
 Name:           xiaomi-nabu-firmware
 Version:        1
 Release:        1%{?dist}
-Summary:        Firmware for running linux on Xiaomi Pad 5 (Nabu)
-License:        MIT
+Summary:        firmware for mipad 5
 URL:            https://gitlab.postmarketos.org/panpanpanpan/nabu-firmware
 Source0:        %{url}/-/archive/%{version}/nabu-firmware-%{version}.tar.gz
-BuildArch:     aarch64
+BuildArch:      noarch
 Requires:       qcom-firmware
+License:        Unknown
+# https://github.com/MiCode/Xiaomi_Kernel_OpenSource/issues/40338
 
 %global _firmwaredir %{_prefix}/lib/firmware
 
 %description
-Firmware for running linux on Xiaomi Pad 5 (Nabu)
+%{summary}
 
 %prep
 %autosetup -n nabu-firmware-%{version}
 
 %install
-mkdir -p %{buildroot}%{_firmwaredir}/qcom \
-         %{buildroot}%{_firmwaredir}/qcom/sm8150/xiaomi/nabu \
+mkdir -p %{buildroot}%{_firmwaredir}/qcom/sm8150/xiaomi/nabu \
          %{buildroot}%{_firmwaredir}/cirrus \
          %{buildroot}%{_firmwaredir}/novatek
 cp -a a630_sqe.fw a640_gmu.bin %{buildroot}%{_firmwaredir}/qcom
@@ -31,3 +31,6 @@ find %{buildroot}%{_firmwaredir} -type f -exec chmod 0644 {} \;
 %{_firmwaredir}/qcom
 %{_firmwaredir}/cirrus
 %{_firmwaredir}/novatek
+
+%changelog
+%autochangelog

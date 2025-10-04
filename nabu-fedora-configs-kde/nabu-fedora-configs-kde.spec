@@ -1,7 +1,7 @@
 %global debug_package %{nil}
 
 Name:           nabu-fedora-configs-kde
-Version:        0.1
+Version:        0.2
 Release:        1%{?dist}
 Summary:        Configurations for Fedora for Nabu kde builds
 License:        MIT
@@ -19,12 +19,15 @@ This package contains configurations specific for Fedora for Nabu builds with kd
 # Nothing to build
 
 %install
-cp -a var %{buildroot}/
+cp -a etc %{buildroot}/
 
 %files
 %attr(644, root, root) %config(noreplace) %{_sysconfdir}/locale.conf
 %attr(644, root, root) %config(noreplace) %{_sysconfdir}/environment.d/99-im.conf
 
 %changelog
-* Wed Oct 04 2025 jhuang6451 <xplayerhtz123@outlook.com> - 0.1-1
-- Initial release
+* Sat Oct 04 2025 jhuang6451 <xplayerhtz123@outlook.com> - 0.2-1
+- Fix error.
+
+* Sat Oct 04 2025 jhuang6451 <xplayerhtz123@outlook.com> - 0.1-1
+- Initial release.

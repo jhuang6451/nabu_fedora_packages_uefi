@@ -1,7 +1,7 @@
 %global debug_package %{nil}
 
 Name:           nabu-fedora-configs-gnome
-Version:        0.4.1
+Version:        0.4.2
 Release:        1%{?dist}
 Summary:        Configurations for Fedora for Nabu Gnome builds
 License:        MIT
@@ -28,11 +28,10 @@ cp -a usr %{buildroot}/
 %attr(644, root, root) %config(noreplace) %{_sysconfdir}/locale.conf
 %attr(644, root, root) %config(noreplace) %{_sysconfdir}/environment.d/99-im.conf
 %attr(644, root, root) %{_prefix}/lib/systemd/system/fcitx5-autostart.service
+%attr(644, root, root) %{_presetdir}/fcitx5-autostart.preset
 
 %post
-if [ $1 -ge 1 ] ; then
-    /usr/bin/systemctl --no-reload preset fcitx5-autostart.service >/dev/null 2>&1 || :
-fi
+%systemd_post fcitx5-autostart.service
 
 %preun
 %systemd_preun fcitx5-autostart.service
@@ -41,7 +40,7 @@ fi
 %systemd_postun_with_restart fcitx5-autostart.service
 
 %changelog
-* Fri Oct 10 2025 jhuang6451 <xplayerhtz123@outlook.com> - 0.4.1-1
+* Fri Oct 10 2025 jhuang6451 <xplayerhtz123@outlook.com> - 0.4.2-1
 - Add fcitx5 autostart service.
 
 * Sat Oct 04 2025 jhuang6451 <xplayerhtz123@outlook.com> - 0.3-1

@@ -1,13 +1,14 @@
 %global debug_package %{nil}
 
 Name:           nabu-fedora-configs-gnome
-Version:        0.4.2
+Version:        0.4.3
 Release:        1%{?dist}
 Summary:        Configurations for Fedora for Nabu Gnome builds
 License:        MIT
 URL:            https://github.com/jhuang6451/nabu_fedora
 Source0:        https://github.com/jhuang6451/nabu_fedora_packages/releases/download/test-%{name}-%{version}/%{name}-%{version}.tar.gz
 BuildArch:      noarch
+BuildRequires:  systemd-rpm-macros
 
 %description
 This package contains configurations specific for Fedora for Nabu builds with Gnome DE
@@ -40,7 +41,7 @@ cp -a usr %{buildroot}/
 %systemd_postun_with_restart fcitx5-autostart.service
 
 %changelog
-* Fri Oct 10 2025 jhuang6451 <xplayerhtz123@outlook.com> - 0.4.2-1
+* Fri Oct 10 2025 jhuang6451 <xplayerhtz123@outlook.com> - 0.4.3-1
 - Add fcitx5 autostart service.
 
 * Sat Oct 04 2025 jhuang6451 <xplayerhtz123@outlook.com> - 0.3-1

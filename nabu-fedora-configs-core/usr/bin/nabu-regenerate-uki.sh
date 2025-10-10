@@ -50,10 +50,8 @@ if [ ! -d "/usr/lib/modules/${TARGET_UNAME_R}" ]; then
 fi
 
 if [ ! -f "${DTB_PATH}" ]; then
-    echo "警告: 设备树文件 (DTB) 未找到: ${DTB_PATH}" >&2
-    echo "如果你不需要独立的 DTB，可以忽略此消息。" >&2
-    # 将变量置空，使其在 ukify 命令中被忽略
-    DTB_PATH=""
+    echo "错误: 设备树文件 (DTB) 未找到: ${DTB_PATH}" >&2
+    exit 1
 fi
 
 # --- 确定最终输出的 EFI 文件名 ---
@@ -90,13 +88,8 @@ ukify_args=(
     --linux="${KERNEL_PATH}"
     --initrd="${INITRD_PATH}"
     --output="${UKI_PATH}"
+    --devicetree="${DTB_PATH}"
 )
-
-# 仅当 DTB 路径有效时才添加 --devicetree 参数
-if [ -n "${DTB_PATH}" ]; then
-    ukify_args+=(--devicetree="${DTB_PATH}")
-    echo "INFO: 将使用设备树: ${DTB_PATH}"
-fi
 
 # 执行 ukify
 ukify "${ukify_args[@]}"

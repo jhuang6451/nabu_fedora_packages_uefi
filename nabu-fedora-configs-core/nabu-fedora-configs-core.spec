@@ -1,7 +1,7 @@
 %global debug_package %{nil}
 
 Name:           nabu-fedora-configs-core
-Version:        0.5.2
+Version:        0.5.3
 Release:        1%{?dist}
 Summary:        Core configuration files for Fedora on Xiaomi Pad 5 (nabu)
 License:        MIT
@@ -65,15 +65,18 @@ plymouth-set-default-theme fedora-mac-style || :
 /usr/bin/nabu-regenerate-uki.sh || :
 echo "--- UKI regeneration process finished. ---"
 
-%systemd_post ath10k-shutdown.service qbootctl.service
+%systemd_post ath10k-shutdown.service
 
 %preun
-%systemd_preun ath10k-shutdown.service rmtfs.service tqftpserv.service qbootctl.service
+%systemd_preun ath10k-shutdown.service
 
 %postun
-%systemd_postun_with_restart ath10k-shutdown.service rmtfs.service tqftpserv.service qbootctl.service
+%systemd_postun_with_restart ath10k-shutdown.service
 
 %changelog
+* Fri Oct 10 2025 jhuang6451 <xplayerhtz123@outlook.com> - 0.5.3-1
+- Standardize status statement against systemd services.
+
 * Fri Oct 10 2025 jhuang6451 <xplayerhtz123@outlook.com> - 0.5.2-1
 - Add UKI regeneration logic.
 

@@ -1,8 +1,8 @@
 %global debug_package %{nil}
 
 Name:           nabu-fedora-configs-core
-Version:        0.4.1
-Release:        2%{?dist}
+Version:        0.5
+Release:        1%{?dist}
 Summary:        Core configuration files for Fedora on Xiaomi Pad 5 (nabu)
 License:        MIT
 URL:            https://github.com/jhuang6451/nabu_fedora
@@ -68,7 +68,7 @@ plymouth-set-default-theme -R fedora-mac-style || :
 %systemd_postun_with_restart ath10k-shutdown.service rmtfs.service tqftpserv.service qbootctl.service
 
 %changelog
-* Fri Oct 10 2025 jhuang6451 <xplayerhtz123@outlook.com> - 0.4.1-2
+* Fri Oct 10 2025 jhuang6451 <xplayerhtz123@outlook.com> - 0.5-1
 - Fix plymouth theme installation.
 
 * Sat Oct 4 2025 jhuang6451 <xplayerhtz123@outlook.com> - 0.4-2

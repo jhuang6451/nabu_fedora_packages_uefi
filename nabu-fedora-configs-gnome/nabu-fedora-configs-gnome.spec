@@ -30,7 +30,9 @@ cp -a usr %{buildroot}/
 %attr(644, root, root) %{_prefix}/lib/systemd/system/fcitx5-autostart.service
 
 %post
-%systemd_post fcitx5-autostart.service
+if [ $1 -ge 1 ] ; then
+    /usr/bin/systemctl --no-reload preset fcitx5-autostart.service >/dev/null 2>&1 || :
+fi
 
 %preun
 %systemd_preun fcitx5-autostart.service

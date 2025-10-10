@@ -88,13 +88,7 @@ INITRD_PATH="/boot/initramfs-${uname_r}.img"
 KERNEL_PATH="/boot/vmlinuz-${uname_r}"
 DTB_PATH="/usr/lib/modules/${uname_r}/dtb/qcom/sm8150-xiaomi-nabu.dtb"
 
-# --- 确定输出路径 ---
-MACHINE_ID=$(cat /etc/machine-id 2>/dev/null)
-if [ -n "$MACHINE_ID" ]; then
-    UKI_PATH="${UKI_DIR}/${MACHINE_ID}-${uname_r}.efi"
-else
-    UKI_PATH="${UKI_DIR}/fedora-${uname_r}.efi"
-fi
+UKI_OUTPUT_PATH="${UKI_DIR}/fedora-${uname_r}.efi"
 mkdir -p "$UKI_DIR"
 
 # --- 步骤 1: 使用 dracut 生成 initramfs ---
@@ -115,15 +109,15 @@ ukify build \
     --linux="${KERNEL_PATH}" \
     --initrd="${INITRD_PATH}" \
     --devicetree="${DTB_PATH}" \
-    --output="${UKI_PATH}"
+    --output="${UKI_OUTPUT_PATH}"
 
-if [ ! -f "${UKI_PATH}" ]; then
-    echo "CRITICAL: ukify failed to generate UKI at ${UKI_PATH}" >&2
+if [ ! -f "${UKI_OUTPUT_PATH}" ]; then
+    echo "CRITICAL: ukify failed to generate UKI at ${UKI_OUTPUT_PATH}" >&2
     # 清理失败的中间产物
     rm -f "${INITRD_PATH}"
     exit 1
 fi
-echo "SUCCESS: UKI generated at ${UKI_PATH}"
+echo "SUCCESS: UKI generated at ${UKI_OUTPUT_PATH}"
 
 # --- 步骤 3: 清理独立的 initramfs ---
 echo "Cleaning up standalone initramfs..."

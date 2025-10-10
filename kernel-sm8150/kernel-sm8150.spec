@@ -1,7 +1,7 @@
 %undefine        _debugsource_packages
 %global tag      6.16
 Version:         6.16.0
-Release:         6.sm8150%{?dist}
+Release:         5.sm8150%{?dist}
 ExclusiveArch:   aarch64
 Name:            kernel-sm8150
 Summary:         Mainline Linux kernel for sm8150 devices
@@ -136,10 +136,8 @@ if [ "$1" -eq 0 ] ; then
 fi
 
 %changelog
-* Fri Oct 10 2025 jhuang6451 <xplayerhtz123@outlook.com> - 6.16.0-6.sm8150
+* Fri Oct 10 2025 jhuang6451 <xplayerhtz123@outlook.com> - 6.16.0-5.sm8150
 - Change UKI name.
-
-* Thu Dec 4 2025 jhuang6451 <xplayerhtz123@outlook.com> - 6.16.0-5.sm8150
 - Change UKI output directory to "/boot/efi/EFI/fedora".
 
 * Thu Sep 25 2025 jhuang6451 <xplayerhtz123@outlook.com> - 6.16.0-4.sm8150

@@ -1,95 +1,98 @@
 #!/bin/bash
 
 # ==============================================================================
-#           手动重新生成 Fedora UKI (Unified Kernel Image) 的脚本
+#      A script to manually regenerate a Fedora UKI (Unified Kernel Image)
 # ==============================================================================
 #
-# 这个脚本旨在为系统中一个已安装的内核版本，手动触发一次完整的 UKI 生成流程。
-# 它模仿了 Fedora 内核 RPM 包在安装后（%posttrans 阶段）执行的自动化步骤。
+# This script is designed to manually trigger a full UKI generation process
+# for an installed kernel version in the system.
+# It mimics the automated steps performed by Fedora's kernel RPM package
+# during its post-transaction scriptlet (%posttrans).
 #
-# 使用场景：
-#   - 在修改了 dracut 配置（例如，添加了新的模块或驱动）后。
-#   - 在更新了 systemd-ukify 的静态配置（例如，更改了内核命令行）后。
-#   - 当你需要为某个已存在的内核版本强制重新打包 EFI 文件时。
+# Use Cases:
+#   - After modifying dracut configurations (e.g., adding new modules or drivers).
+#   - After updating static configurations for systemd-ukify (e.g., changing the kernel command line).
+#   - When you need to forcibly repackage the EFI file for an existing kernel version.
 #
-# 前提条件：
-#   - 对应的内核包已经安装（vmlinuz, 模块, dtb 等文件存在）。
-#   - `dracut` 和 `systemd-boot` (提供 ukify) 已经安装。
-#   - 相关的配置文件已经就位：
-#     - dracut 配置: /etc/dracut.conf 和 /etc/dracut.conf.d/
-#     - ukify  配置: /etc/systemd/ukify.conf
+# Prerequisites:
+#   - The corresponding kernel package is already installed (vmlinuz, modules, dtb files exist).
+#   - `dracut` and `systemd-boot` (which provides ukify) are installed.
+#   - Relevant configuration files are in place:
+#     - dracut config: /etc/dracut.conf and /etc/dracut.conf.d/
+#     - ukify  config: /etc/systemd/ukify.conf
 #
 # ==============================================================================
 
-set -e  # 任何命令失败立即退出
-set -u  # 变量未定义时报错
-set -o pipefail # 管道中任何一个命令失败，则整个管道失败
+set -e  # Exit immediately if a command exits with a non-zero status.
+set -u  # Treat unset variables as an error when substituting.
+set -o pipefail # The return value of a pipeline is the status of the last command to exit with a non-zero status.
 
-# --- 脚本参数 ---
-# 如果用户没有在命令行提供内核版本，则自动使用当前正在运行的内核版本。
-# 你也可以手动指定，例如：./regenerate-uki.sh 6.16-5.sm8150.aarch64
+# --- Script Arguments ---
+# If the user does not provide a kernel version on the command line,
+# the currently running kernel version is used automatically.
+# You can also specify one manually, e.g., ./regenerate-uki.sh 6.16-5.sm8150.aarch64
 TARGET_UNAME_R=${1:-$(uname -r)}
 
-echo "--- 准备为内核版本 ${TARGET_UNAME_R} 重新生成 UKI ---"
+echo "--- Preparing to regenerate UKI for kernel version ${TARGET_UNAME_R} ---"
 
-# --- 检查依赖的命令是否存在 ---
-command -v dracut >/dev/null 2>&1 || { echo >&2 "错误: 'dracut' 命令未找到。请先安装它。"; exit 1; }
-command -v ukify >/dev/null 2>&1 || { echo >&2 "错误: 'ukify' 命令未找到。它通常由 'systemd-boot' 包提供。"; exit 1; }
-command -v depmod >/dev/null 2>&1 || { echo >&2 "错误: 'depmod' 命令未找到。请检查 'kmod' 包是否已安装。"; exit 1; }
+# --- Check for required commands ---
+command -v dracut >/dev/null 2>&1 || { echo >&2 "Error: 'dracut' command not found. Please install it first."; exit 1; }
+command -v ukify >/dev/null 2>&1 || { echo >&2 "Error: 'ukify' command not found. It is usually provided by the 'systemd-boot' package."; exit 1; }
+command -v depmod >/dev/null 2>&1 || { echo >&2 "Error: 'depmod' command not found. Please check if the 'kmod' package is installed."; exit 1; }
 
-# --- 定义和验证路径 ---
+# --- Define and validate paths ---
 KERNEL_PATH="/boot/vmlinuz-${TARGET_UNAME_R}"
-INITRD_PATH="/boot/initramfs-${TARGET_UNAME_R}.img" # 这是一个临时文件
-DTB_PATH="/usr/lib/modules/${TARGET_UNAME_R}/dtb/qcom/sm8150-xiaomi-nabu.dtb" # 从 spec 文件中硬编码
+INITRD_PATH="/boot/initramfs-${TARGET_UNAME_R}.img" # This is a temporary file
+DTB_PATH="/usr/lib/modules/${TARGET_UNAME_R}/dtb/qcom/sm8150-xiaomi-nabu.dtb" # Hardcoded from the spec file
 UKI_DIR="/boot/efi/EFI/fedora"
 
-# 检查所需文件是否存在
+# Check if the required files exist
 if [ ! -f "${KERNEL_PATH}" ]; then
-    echo "错误: 内核镜像未找到: ${KERNEL_PATH}" >&2
+    echo "Error: Kernel image not found: ${KERNEL_PATH}" >&2
     exit 1
 fi
 
 if [ ! -d "/usr/lib/modules/${TARGET_UNAME_R}" ]; then
-    echo "错误: 内核模块目录未找到: /usr/lib/modules/${TARGET_UNAME_R}" >&2
+    echo "Error: Kernel modules directory not found: /usr/lib/modules/${TARGET_UNAME_R}" >&2
     exit 1
 fi
 
 if [ ! -f "${DTB_PATH}" ]; then
-    echo "警告: 设备树文件 (DTB) 未找到: ${DTB_PATH}" >&2
-    echo "如果你不需要独立的 DTB，可以忽略此消息。" >&2
-    # 将变量置空，使其在 ukify 命令中被忽略
+    echo "Warning: Device Tree Blob (DTB) file not found: ${DTB_PATH}" >&2
+    echo "If you don't need a separate DTB, you can ignore this message." >&2
+    # Set the variable to empty so it gets ignored in the ukify command
     DTB_PATH=""
 fi
 
-# --- 确定最终输出的 EFI 文件名 ---
+# --- Determine the final output EFI filename ---
 UKI_PATH="${UKI_DIR}/fedora-${TARGET_UNAME_R}.efi"
 
-# 确保输出目录存在
+# Ensure the output directory exists
 mkdir -p "$UKI_DIR"
 
 # ==============================================================================
-#                           UKI 生成流程开始
+#                       UKI Generation Process Starts
 # ==============================================================================
 
-# --- 步骤 1: 重新生成模块依赖 ---
-echo "INFO: 正在为 ${TARGET_UNAME_R} 运行 depmod..."
+# --- Step 1: Regenerate module dependencies ---
+echo "INFO: Running depmod for ${TARGET_UNAME_R}..."
 depmod -a "${TARGET_UNAME_R}"
-echo "SUCCESS: 模块依赖已更新。"
+echo "SUCCESS: Module dependencies have been updated."
 
-# --- 步骤 2: 使用 dracut 生成临时的 initramfs ---
-echo "INFO: 正在使用 dracut 生成 initramfs..."
-# 使用 --force 选项确保覆盖任何已存在的同名文件
+# --- Step 2: Generate a temporary initramfs using dracut ---
+echo "INFO: Generating initramfs using dracut..."
+# Use the --force option to ensure any existing file with the same name is overwritten
 dracut --kver "${TARGET_UNAME_R}" --force "${INITRD_PATH}"
 if [ ! -f "${INITRD_PATH}" ]; then
-    echo "CRITICAL: dracut 未能成功创建 initramfs 文件: ${INITRD_PATH}" >&2
+    echo "CRITICAL: dracut failed to create the initramfs file: ${INITRD_PATH}" >&2
     exit 1
 fi
-echo "SUCCESS: 临时的 initramfs 已生成于 ${INITRD_PATH}"
+echo "SUCCESS: Temporary initramfs has been generated at ${INITRD_PATH}"
 
-# --- 步骤 3: 使用 systemd-ukify 将所有组件打包成 UKI ---
-echo "INFO: 正在使用 systemd-ukify 生成最终的 UKI..."
+# --- Step 3: Package all components into a UKI using systemd-ukify ---
+echo "INFO: Generating the final UKI using systemd-ukify..."
 
-# 构建 ukify 命令参数
+# Build the ukify command arguments
 ukify_args=(
     build
     --linux="${KERNEL_PATH}"
@@ -97,28 +100,28 @@ ukify_args=(
     --output="${UKI_PATH}"
 )
 
-# 仅当 DTB 路径有效时才添加 --devicetree 参数
+# Only add the --devicetree argument if the DTB path is valid
 if [ -n "${DTB_PATH}" ]; then
     ukify_args+=(--devicetree="${DTB_PATH}")
-    echo "INFO: 将使用设备树: ${DTB_PATH}"
+    echo "INFO: Using device tree: ${DTB_PATH}"
 fi
 
-# 执行 ukify
+# Execute ukify
 ukify "${ukify_args[@]}"
 
 if [ ! -f "${UKI_PATH}" ]; then
-    echo "CRITICAL: ukify 未能成功创建 UKI 文件: ${UKI_PATH}" >&2
-    # 清理失败后留下的临时文件
+    echo "CRITICAL: ukify failed to create the UKI file: ${UKI_PATH}" >&2
+    # Clean up the temporary file left after a failure
     rm -f "${INITRD_PATH}"
     exit 1
 fi
-echo "SUCCESS: UKI 已成功生成于: ${UKI_PATH}"
+echo "SUCCESS: UKI has been successfully generated at: ${UKI_PATH}"
 
-# --- 步骤 4: 清理临时的 initramfs ---
-echo "INFO: 正在清理临时的 initramfs 文件..."
+# --- Step 4: Clean up the temporary initramfs ---
+echo "INFO: Cleaning up the temporary initramfs file..."
 rm -f "${INITRD_PATH}"
-echo "SUCCESS: 清理完成。"
+echo "SUCCESS: Cleanup complete."
 
 # ==============================================================================
-echo "--- 所有操作已成功完成！ ---"
+echo "--- All operations have been completed successfully! ---"
 # ==============================================================================

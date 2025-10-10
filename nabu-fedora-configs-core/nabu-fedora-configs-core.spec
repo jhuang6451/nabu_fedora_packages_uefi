@@ -1,7 +1,7 @@
 %global debug_package %{nil}
 
 Name:           nabu-fedora-configs-core
-Version:        0.5.1
+Version:        0.5.2
 Release:        1%{?dist}
 Summary:        Core configuration files for Fedora on Xiaomi Pad 5 (nabu)
 License:        MIT
@@ -9,6 +9,7 @@ URL:            https://github.com/jhuang6451/nabu_fedora
 Source0:        https://github.com/jhuang6451/nabu_fedora_packages/releases/download/test-%{name}-%{version}/%{name}-%{version}.tar.gz
 BuildArch:      noarch
 BuildRequires:  systemd-rpm-macros
+BuildRequires:  tar
 Requires:       dracut
 Requires:       systemd-ukify
 Requires:       rmtfs
@@ -50,14 +51,19 @@ tar -xf fedora-mac-style.tar.xz -C %{buildroot}%{_datadir}/plymouth/themes/fedor
 %attr(644, root, root) %config(noreplace) %{_sysconfdir}/pulse/daemon.conf.d/89-xiaomi_nabu.conf
 %attr(644, root, root) %config(noreplace) %{_sysconfdir}/pulse/default.pa.d/nabu.pa
 %{_datadir}/plymouth/themes/fedora-mac-style/
+%{_bindir}/nabu-regenerate-uki
 
 %post
 # Create the EFI directory as a mount point for the ESP.
 # This is required for UKI generation and bootloader installation.
-mkdir -p /boot/efi
-# Set plymouth theme
-plymouth-set-default-theme -R fedora-mac-style || :
+mkdir -p /boot/efi || :
 
+# Set plymouth theme. 
+plymouth-set-default-theme fedora-mac-style || :
+
+# Trigger UKI regeneration for installed kernels."
+/usr/bin/nabu-regenerate-uki.sh || :
+echo "--- UKI regeneration process finished. ---"
 
 %systemd_post ath10k-shutdown.service qbootctl.service
 
@@ -68,6 +74,9 @@ plymouth-set-default-theme -R fedora-mac-style || :
 %systemd_postun_with_restart ath10k-shutdown.service rmtfs.service tqftpserv.service qbootctl.service
 
 %changelog
+* Fri Oct 10 2025 jhuang6451 <xplayerhtz123@outlook.com> - 0.5.2-1
+- Add UKI regeneration logic.
+
 * Fri Oct 10 2025 jhuang6451 <xplayerhtz123@outlook.com> - 0.5.1-1
 - Fix plymouth theme installation.
 

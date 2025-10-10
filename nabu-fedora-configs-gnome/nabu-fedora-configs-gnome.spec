@@ -1,7 +1,7 @@
 %global debug_package %{nil}
 
 Name:           nabu-fedora-configs-gnome
-Version:        0.4
+Version:        0.4.1
 Release:        1%{?dist}
 Summary:        Configurations for Fedora for Nabu Gnome builds
 License:        MIT
@@ -41,7 +41,7 @@ fi
 %systemd_postun_with_restart fcitx5-autostart.service
 
 %changelog
-* Fri Oct 10 2025 jhuang6451 <xplayerhtz123@outlook.com> - 0.4-1
+* Fri Oct 10 2025 jhuang6451 <xplayerhtz123@outlook.com> - 0.4.1-1
 - Add fcitx5 autostart service.
 
 * Sat Oct 04 2025 jhuang6451 <xplayerhtz123@outlook.com> - 0.3-1

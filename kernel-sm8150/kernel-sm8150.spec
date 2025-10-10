@@ -1,7 +1,7 @@
 %undefine        _debugsource_packages
 %global tag      6.16
 Version:         6.16.0
-Release:         5.sm8150%{?dist}
+Release:         6.sm8150%{?dist}
 ExclusiveArch:   aarch64
 Name:            kernel-sm8150
 Summary:         Mainline Linux kernel for sm8150 devices
@@ -88,13 +88,7 @@ INITRD_PATH="/boot/initramfs-${uname_r}.img"
 KERNEL_PATH="/boot/vmlinuz-${uname_r}"
 DTB_PATH="/usr/lib/modules/${uname_r}/dtb/qcom/sm8150-xiaomi-nabu.dtb"
 
-# --- 确定输出路径 ---
-MACHINE_ID=$(cat /etc/machine-id 2>/dev/null)
-if [ -n "$MACHINE_ID" ]; then
-    UKI_PATH="${UKI_DIR}/${MACHINE_ID}-${uname_r}.efi"
-else
-    UKI_PATH="${UKI_DIR}/fedora-${uname_r}.efi"
-fi
+UKI_OUTPUT_PATH="${UKI_DIR}/fedora-${uname_r}.efi"
 mkdir -p "$UKI_DIR"
 
 # --- 步骤 1: 使用 dracut 生成 initramfs ---
@@ -115,15 +109,15 @@ ukify build \
     --linux="${KERNEL_PATH}" \
     --initrd="${INITRD_PATH}" \
     --devicetree="${DTB_PATH}" \
-    --output="${UKI_PATH}"
+    --output="${UKI_OUTPUT_PATH}"
 
-if [ ! -f "${UKI_PATH}" ]; then
-    echo "CRITICAL: ukify failed to generate UKI at ${UKI_PATH}" >&2
+if [ ! -f "${UKI_OUTPUT_PATH}" ]; then
+    echo "CRITICAL: ukify failed to generate UKI at ${UKI_OUTPUT_PATH}" >&2
     # 清理失败的中间产物
     rm -f "${INITRD_PATH}"
     exit 1
 fi
-echo "SUCCESS: UKI generated at ${UKI_PATH}"
+echo "SUCCESS: UKI generated at ${UKI_OUTPUT_PATH}"
 
 # --- 步骤 3: 清理独立的 initramfs ---
 echo "Cleaning up standalone initramfs..."
@@ -142,20 +136,23 @@ if [ "$1" -eq 0 ] ; then
 fi
 
 %changelog
-* Thu Dec 4 2025 jhuang6451 <xplayerhtz123@outlook.com> - 6.16-5.sm8150
+* Fri Oct 10 2025 jhuang6451 <xplayerhtz123@outlook.com> - 6.16.0-6.sm8150
+- Change UKI name.
+
+* Thu Dec 4 2025 jhuang6451 <xplayerhtz123@outlook.com> - 6.16.0-5.sm8150
 - Change UKI output directory to "/boot/efi/EFI/fedora".
 
-* Thu Sep 25 2025 jhuang6451 <xplayerhtz123@outlook.com> - 6.16-4.sm8150
+* Thu Sep 25 2025 jhuang6451 <xplayerhtz123@outlook.com> - 6.16.0-4.sm8150
 - Switched UKI generation to a dracut + systemd-ukify two-step process.
 - dracut is now only responsible for creating the initramfs.
 - systemd-ukify is used to assemble the kernel, initramfs, cmdline, and DTB into the final UKI.
 
-* Thu Sep 25 2025 jhuang6451 <xplayerhtz123@outlook.com> - 6.16-3.sm8150
+* Thu Sep 25 2025 jhuang6451 <xplayerhtz123@outlook.com> - 6.16.0-3.sm8150
 - Replaced `kernel-install` with a direct `dracut` call in %posttrans scriptlet.
 - This fixes a critical bug where the device tree (DTB) was not being
   included in the generated UKI, ensuring the kernel is bootable.
 
-* Sat Sep 20 2025 jhuang6451 <xplayerhtz123@outlook.com> - 6.16-2.sm8150
+* Sat Sep 20 2025 jhuang6451 <xplayerhtz123@outlook.com> - 6.16.0-2.sm8150
 - Aligned post-install script with kernel-install framework for consistent UKI generation.
 - Removed redundant dracut call from %posttrans.
 
@@ -163,7 +160,7 @@ fi
 - Modified spec for standard Fedora systems, removing ostree logic.
 - Adopted standard file paths (/boot) and kernel-install for UEFI/bootloader integration.
 
-* Fri Sep 12 2025 jhuang6451 <xplayerhtz123@outlook.com> - 6.16-0.sm8150
+* Fri Sep 12 2025 jhuang6451 <xplayerhtz123@outlook.com> - 6.16.0-0.sm8150
 - Added post-transaction script to copy kernel and DTB to ESP for UEFI boot.
 
 * Fri Jul 25 2025 gmanka 6.16.0

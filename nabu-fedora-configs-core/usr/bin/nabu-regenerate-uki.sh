@@ -1,16 +1,11 @@
 #!/bin/bash
 
 # ==============================================================================
-#           手动重新生成 Fedora UKI (Unified Kernel Image) 的脚本
+#           重新为 nabu 生成 Fedora UKI 
 # ==============================================================================
 #
-# 这个脚本旨在为系统中一个已安装的内核版本，手动触发一次完整的 UKI 生成流程。
-# 它模仿了 Fedora 内核 RPM 包在安装后（%posttrans 阶段）执行的自动化步骤。
-#
-# 使用场景：
-#   - 在修改了 dracut 配置（例如，添加了新的模块或驱动）后。
-#   - 在更新了 systemd-ukify 的静态配置（例如，更改了内核命令行）后。
-#   - 当你需要为某个已存在的内核版本强制重新打包 EFI 文件时。
+# 这个脚本旨在为系统中一个已安装的内核版本，触发一次完整的 UKI 生成流程。
+# 它模仿了 kernel-sm8150 RPM 包在安装后（%posttrans 阶段）执行的自动化步骤。
 #
 # 前提条件：
 #   - 对应的内核包已经安装（vmlinuz, 模块, dtb 等文件存在）。
@@ -55,10 +50,8 @@ if [ ! -d "/usr/lib/modules/${TARGET_UNAME_R}" ]; then
 fi
 
 if [ ! -f "${DTB_PATH}" ]; then
-    echo "警告: 设备树文件 (DTB) 未找到: ${DTB_PATH}" >&2
-    echo "如果你不需要独立的 DTB，可以忽略此消息。" >&2
-    # 将变量置空，使其在 ukify 命令中被忽略
-    DTB_PATH=""
+    echo "错误: 设备树文件 (DTB) 未找到: ${DTB_PATH}" >&2
+    exit 1
 fi
 
 # --- 确定最终输出的 EFI 文件名 ---
@@ -95,13 +88,8 @@ ukify_args=(
     --linux="${KERNEL_PATH}"
     --initrd="${INITRD_PATH}"
     --output="${UKI_PATH}"
+    --devicetree="${DTB_PATH}"
 )
-
-# 仅当 DTB 路径有效时才添加 --devicetree 参数
-if [ -n "${DTB_PATH}" ]; then
-    ukify_args+=(--devicetree="${DTB_PATH}")
-    echo "INFO: 将使用设备树: ${DTB_PATH}"
-fi
 
 # 执行 ukify
 ukify "${ukify_args[@]}"

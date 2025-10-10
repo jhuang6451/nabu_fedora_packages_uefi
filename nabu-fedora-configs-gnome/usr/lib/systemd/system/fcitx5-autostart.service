@@ -1,0 +1,11 @@
+[Unit]
+Description=Fcitx 5 Input Method Framework Autostart
+After=graphical.target
+PartOf=graphical.target
+
+[Service]
+ExecStart=/usr/bin/fcitx5
+Restart=on-failure
+
+[Install]
+WantedBy=default.target

@@ -1,14 +1,15 @@
 %global debug_package %{nil}
 
 Name:           nabu-fedora-configs-core
-Version:        0.4
-Release:        2%{?dist}
-Summary:        Core, audio and branding configuration files for Fedora on Xiaomi Pad 5 (nabu)
+Version:        0.5.5
+Release:        1%{?dist}
+Summary:        Core configuration files for Fedora on Xiaomi Pad 5 (nabu)
 License:        MIT
 URL:            https://github.com/jhuang6451/nabu_fedora
-Source0:        https://github.com/jhuang6451/nabu_fedora_packages/releases/download/%{name}-%{version}/%{name}-%{version}.tar.gz
+Source0:        https://github.com/jhuang6451/nabu_fedora_packages/releases/download/test-%{name}-%{version}/%{name}-%{version}.tar.gz
 BuildArch:      noarch
 BuildRequires:  systemd-rpm-macros
+BuildRequires:  tar
 Requires:       dracut
 Requires:       systemd-ukify
 Requires:       rmtfs
@@ -31,6 +32,11 @@ This package contains the essential configuration files for running Fedora on th
 %install
 cp -a etc %{buildroot}/
 cp -a usr %{buildroot}/
+chmod +x %{buildroot}%{_bindir}/nabu-regenerate-uki.sh
+
+# install plymouth theme.
+mkdir -p %{buildroot}%{_datadir}/plymouth/themes/fedora-mac-style
+tar -xf fedora-mac-style.tar.xz -C %{buildroot}%{_datadir}/plymouth/themes/fedora-mac-style --strip-components=1
 
 %files
 %attr(644, root, root) %config(noreplace) %{_sysconfdir}/dracut.conf.d/99-nabu-generic.conf
@@ -45,35 +51,52 @@ cp -a usr %{buildroot}/
 %attr(644, root, root) %{_datadir}/alsa/ucm2/Xiaomi/nabu/HiFi.conf
 %attr(644, root, root) %config(noreplace) %{_sysconfdir}/pulse/daemon.conf.d/89-xiaomi_nabu.conf
 %attr(644, root, root) %config(noreplace) %{_sysconfdir}/pulse/default.pa.d/nabu.pa
-%attr(644, root, root) %{_datadir}/plymouth/themes/fedora-mac-style.tar.xz
+%{_datadir}/plymouth/themes/fedora-mac-style/
+%attr(755, root, root) %{_bindir}/nabu-regenerate-uki.sh
 
 %post
 # Create the EFI directory as a mount point for the ESP.
 # This is required for UKI generation and bootloader installation.
-mkdir -p /boot/efi
-# Unpack plymouth theme and set it as default
-if [ -f /usr/share/plymouth/themes/fedora-mac-style.tar.xz ]; then
-    tar -xf /usr/share/plymouth/themes/fedora-mac-style.tar.xz -C /usr/share/plymouth/themes/ || :
-    plymouth-set-default-theme -R fedora-mac-style || :
-fi
+mkdir -p /boot/efi || :
 
+# Set plymouth theme. 
+plymouth-set-default-theme fedora-mac-style || :
 
-%systemd_post ath10k-shutdown.service qbootctl.service
+# Trigger UKI regeneration for installed kernels."
+/usr/bin/nabu-regenerate-uki.sh || :
+echo "--- UKI regeneration process finished. ---"
+
+%systemd_post ath10k-shutdown.service
 
 %preun
-%systemd_preun ath10k-shutdown.service rmtfs.service tqftpserv.service qbootctl.service
+%systemd_preun ath10k-shutdown.service
 
 %postun
-%systemd_postun_with_restart ath10k-shutdown.service rmtfs.service tqftpserv.service qbootctl.service
+%systemd_postun_with_restart ath10k-shutdown.service
 
 %changelog
-* Tue Oct 4 2025 jhuang6451 <xplayerhtz123@outlook.com> - 0.4-2
+* Fri Oct 10 2025 jhuang6451 <xplayerhtz123@outlook.com> - 0.5.5-1
+- Force check dtb when regenerate UKI.
+
+* Fri Oct 10 2025 jhuang6451 <xplayerhtz123@outlook.com> - 0.5.4-1
+- Add execute permission for "nabu-regenerate-uki.sh".
+
+* Fri Oct 10 2025 jhuang6451 <xplayerhtz123@outlook.com> - 0.5.3-1
+- Standardize status statement against systemd services.
+
+* Fri Oct 10 2025 jhuang6451 <xplayerhtz123@outlook.com> - 0.5.2-1
+- Add UKI regeneration logic.
+
+* Fri Oct 10 2025 jhuang6451 <xplayerhtz123@outlook.com> - 0.5.1-1
+- Fix plymouth theme installation.
+
+* Sat Oct 4 2025 jhuang6451 <xplayerhtz123@outlook.com> - 0.4-2
 - Added plymouth theme and updated kernel cmdline.
 
-* Tue Oct 4 2025 jhuang6451 <xplayerhtz123@outlook.com> - 0.3-2
+* Sat Oct 4 2025 jhuang6451 <xplayerhtz123@outlook.com> - 0.3-2
 - Moved some configs from extra to core.
 
-* Tue Oct 4 2025 jhuang6451 <xplayerhtz123@outlook.com> - 0.2-2
+* Sat Oct 4 2025 jhuang6451 <xplayerhtz123@outlook.com> - 0.2-2
 - Removed "os-release".
 
 * Tue Sep 30 2025 jhuang6451 <xplayerhtz123@outlook.com> - 0.2-1

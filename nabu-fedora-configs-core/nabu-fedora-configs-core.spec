@@ -1,7 +1,7 @@
 %global debug_package %{nil}
 
 Name:           nabu-fedora-configs-core
-Version:        0.5.3
+Version:        0.5.4
 Release:        1%{?dist}
 Summary:        Core configuration files for Fedora on Xiaomi Pad 5 (nabu)
 License:        MIT
@@ -32,6 +32,7 @@ This package contains the essential configuration files for running Fedora on th
 %install
 cp -a etc %{buildroot}/
 cp -a usr %{buildroot}/
+chmod +x %{buildroot}%{_bindir}/nabu-regenerate-uki.sh
 
 # install plymouth theme.
 mkdir -p %{buildroot}%{_datadir}/plymouth/themes/fedora-mac-style
@@ -51,7 +52,7 @@ tar -xf fedora-mac-style.tar.xz -C %{buildroot}%{_datadir}/plymouth/themes/fedor
 %attr(644, root, root) %config(noreplace) %{_sysconfdir}/pulse/daemon.conf.d/89-xiaomi_nabu.conf
 %attr(644, root, root) %config(noreplace) %{_sysconfdir}/pulse/default.pa.d/nabu.pa
 %{_datadir}/plymouth/themes/fedora-mac-style/
-%{_bindir}/nabu-regenerate-uki
+%attr(755, root, root) %{_bindir}/nabu-regenerate-uki.sh
 
 %post
 # Create the EFI directory as a mount point for the ESP.
@@ -74,6 +75,9 @@ echo "--- UKI regeneration process finished. ---"
 %systemd_postun_with_restart ath10k-shutdown.service
 
 %changelog
+* Fri Oct 10 2025 jhuang6451 <xplayerhtz123@outlook.com> - 0.5.4-1
+- Add execute permission for "nabu-regenerate-uki.sh".
+
 * Fri Oct 10 2025 jhuang6451 <xplayerhtz123@outlook.com> - 0.5.3-1
 - Standardize status statement against systemd services.
 

@@ -21,12 +21,16 @@ This package contains configurations specific for Fedora for Nabu with niri comp
 
 %install
 cp -a etc %{buildroot}/
+cp -a usr %{buildroot}/
 
 %files
+%attr(644, root, root) %config(noreplace) %{_sysconfdir}/locale.conf
+%attr(644, root, root) %config(noreplace) %{_sysconfdir}/environment.d/99-im.conf
+%attr(644, root, root) %{_prefix}/lib/systemd/system/fcitx5-autostart.service
+%attr(644, root, root) %{_presetdir}/fcitx5-autostart.preset
 %attr(644, root, root) %{_sysconfdir}/skel/.config/niri/config.kdl
 
 %post
-
 
 %changelog
 * Sun Oct 12 2025 jhuang6451 <xplayerhtz123@outlook.com> - 0.1.0-1

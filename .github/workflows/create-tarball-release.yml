@@ -4,7 +4,7 @@ on:
   push:
     branches:
       - "release"
-      - "exp"
+#      - "test"
     paths:
       - '**/*.spec'
       - '.release-tarballs'
@@ -80,7 +80,7 @@ jobs:
       - name: Create GitHub Release for ${{ matrix.package.name }}
         uses: softprops/action-gh-release@v1
         with:
-          tag_name: ${{ github.ref_name == 'exp' && format('test-{0}-{1}', matrix.package.name, matrix.package.version) || format('{0}-{1}', matrix.package.name, matrix.package.version) }}
+          tag_name: ${{ github.ref_name == 'test' && format('test-{0}-{1}', matrix.package.name, matrix.package.version) || format('{0}-{1}', matrix.package.name, matrix.package.version) }}
           files: ${{ steps.create_tarball.outputs.tarball_name }}
           name: Release ${{ matrix.package.name }} ${{ matrix.package.version }}
         env:
@@ -112,7 +112,7 @@ jobs:
           COMMITTISH: ${{ github.ref_name }}
           SUBDIRECTORY: ${{ matrix.package.name }}
           SPEC: ${{ matrix.package.name }}.spec
-          COPR_REPO: ${{ github.ref_name == 'exp' && 'nabu_fedora_packages_test' || 'nabu_fedora_packages' }}
+          COPR_REPO: ${{ github.ref_name == 'test' && 'nabu_fedora_packages_test' || 'nabu_fedora_packages' }}
         run: |
           chmod +x ./scripts/trigger-copr-build.sh
           ./scripts/trigger-copr-build.sh

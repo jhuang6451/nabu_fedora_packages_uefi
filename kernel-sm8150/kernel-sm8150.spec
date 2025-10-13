@@ -1,7 +1,7 @@
 %undefine        _debugsource_packages
 %global tag      6.16
 Version:         6.16.0
-Release:         5.sm8150%{?dist}
+Release:         6.sm8150%{?dist}
 ExclusiveArch:   aarch64
 Name:            kernel-sm8150
 Summary:         Mainline Linux kernel for sm8150 devices
@@ -137,6 +137,9 @@ if [ "$1" -eq 0 ] ; then
 fi
 
 %changelog
+* Mon Oct 13 2025 jhuang6451 <xplayerhtz123@outlook.com> - 6.16.0-6.sm8150
+- Add screen rotation property patch to dts.
+
 * Fri Oct 10 2025 jhuang6451 <xplayerhtz123@outlook.com> - 6.16.0-5.sm8150
 - Change UKI name.
 - Change UKI output directory to "/boot/efi/EFI/fedora".

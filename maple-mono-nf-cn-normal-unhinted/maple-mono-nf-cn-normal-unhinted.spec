@@ -1,31 +1,30 @@
 %global debug_package %{nil}
 
 Name:           maple-mono-nf-cn-normal-unhinted
-Version:        0.1.0
+Version:        7.7
 Release:        1%{?dist}
 Summary:        Maple Mono font full CN, unhinted version with "--normal" preset
 BuildArch:      noarch
 License:        OFL-1.1
-URL:            https://github.com/jhuang6451/nabu_fedora_packages
-Source0:        MapleMonoNormal-NF-CN-unhinted.zip
+URL:            https://github.com/subframe7536/maple-font
+Source0:        %{url}/releases/download/v%{version}/MapleMonoNormal-NF-CN-unhinted.zip
+
 Requires(post):   fontconfig
 Requires(postun): fontconfig
 
 %description
-Maple Mono font full CN, unhinted version with "--normal" preset
+Maple Mono font full CN, unhinted version with "--normal" preset.
 
 %prep
 %autosetup -c
 
 %build
-# Nothing to build
+# 无需构建
 
 %install
 mkdir -p %{buildroot}%{_fontdir}/%{name}
 install -m 644 -p *.ttf %{buildroot}%{_fontdir}/%{name}/
-
-%files
-%{_fontdir}/%{name}
+install -m 644 -p LICENSE.txt %{buildroot}%{_fontdir}/%{name}/
 
 %post
 fc-cache -f -v %{_fontdir}/%{name} || :
@@ -35,6 +34,8 @@ if [ $1 -eq 0 ] ; then
     fc-cache -f -v %{_fontdir}/%{name} || :
 fi
 
+%files
+%{_fontdir}/%{name}
 %license LICENSE.txt
 
 %changelog

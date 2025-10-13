@@ -22,9 +22,8 @@ Maple Mono font full CN, unhinted version with "--normal" preset.
 # 无需构建
 
 %install
-mkdir -p %{buildroot}%{_fontdir}/%{name}
-install -m 644 -p *.ttf %{buildroot}%{_fontdir}/%{name}/
-install -m 644 -p LICENSE.txt %{buildroot}%{_fontdir}/%{name}/
+mkdir -p %{buildroot}/usr/share/fonts/%{name}
+install -m 644 -p *.ttf %{buildroot}/usr/share/fonts/
 
 %post
 fc-cache -f -v %{_fontdir}/%{name} || :
@@ -35,7 +34,7 @@ if [ $1 -eq 0 ] ; then
 fi
 
 %files
-%{_fontdir}/%{name}
+/usr/share/fonts/%{name}
 %license LICENSE.txt
 
 %changelog

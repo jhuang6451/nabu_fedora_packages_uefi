@@ -1,9 +1,9 @@
 %global debug_package %{nil}
 
-Name:           nabu-fedora-configs-gnome
-Version:        0.4.5
+Name:           nabu-fedora-configs-niri
+Version:        0.1.0
 Release:        1%{?dist}
-Summary:        Configurations for Fedora for Nabu with Gnome DE
+Summary:        Configurations for Fedora for Nabu with niri Composer
 License:        MIT
 URL:            https://github.com/jhuang6451/nabu_fedora
 Source0:        https://github.com/jhuang6451/nabu_fedora_packages/releases/download/%{name}-%{version}/%{name}-%{version}.tar.gz
@@ -11,7 +11,7 @@ BuildArch:      noarch
 BuildRequires:  systemd-rpm-macros
 
 %description
-This package contains configurations specific for Fedora for Nabu builds with Gnome DE
+This package contains configurations specific for Fedora for Nabu with niri composer
 
 %prep
 %autosetup
@@ -45,17 +45,5 @@ fi
 %systemd_postun_with_restart fcitx5-autostart.service
 
 %changelog
-* Fri Oct 10 2025 jhuang6451 <xplayerhtz123@outlook.com> - 0.4.5-1
-- Better way to install gdm monitor settings.
-
-* Fri Oct 10 2025 jhuang6451 <xplayerhtz123@outlook.com> - 0.4.3-1
-- Add fcitx5 autostart service.
-
-* Sat Oct 04 2025 jhuang6451 <xplayerhtz123@outlook.com> - 0.3-1
-- Fix error.
-
-* Sat Oct 04 2025 jhuang6451 <xplayerhtz123@outlook.com> - 0.2-1
-- Added fcitx5 envs and locale.conf.
-
-* Wed Oct 01 2025 jhuang6451 <xplayerhtz123@outlook.com> - 0.1-1
+* SUn Oct 12 2025 jhuang6451 <xplayerhtz123@outlook.com> - 0.1.0-1
 - Initial release.

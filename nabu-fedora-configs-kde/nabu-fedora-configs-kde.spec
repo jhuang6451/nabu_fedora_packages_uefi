@@ -3,7 +3,7 @@
 Name:           nabu-fedora-configs-kde
 Version:        0.2
 Release:        1%{?dist}
-Summary:        Configurations for Fedora for Nabu kde builds
+Summary:        Configurations for Fedora for Nabu with KDE Plasma DE
 License:        MIT
 URL:            https://github.com/jhuang6451/nabu_fedora
 Source0:        https://github.com/jhuang6451/nabu_fedora_packages/releases/download/%{name}-%{version}/%{name}-%{version}.tar.gz

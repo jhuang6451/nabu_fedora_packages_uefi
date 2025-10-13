@@ -23,7 +23,7 @@ Maple Mono font full CN, unhinted version with "--normal" preset.
 
 %install
 mkdir -p %{buildroot}/usr/share/fonts/%{name}
-install -m 644 -p *.ttf %{buildroot}/usr/share/fonts/
+install -m 644 -p *.ttf %{buildroot}/usr/share/fonts/%{name}
 
 %post
 fc-cache -f -v %{_fontdir}/%{name} || :

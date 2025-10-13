@@ -34,7 +34,8 @@ if [ $1 -eq 0 ] ; then
 fi
 
 %files
-/usr/share/fonts/%{name}
+/usr/share/fonts/%{name}/*.ttf
+%dir /usr/share/fonts/%{name}
 %license LICENSE.txt
 
 %changelog

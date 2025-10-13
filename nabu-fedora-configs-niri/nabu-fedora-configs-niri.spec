@@ -23,11 +23,11 @@ This package contains configurations specific for Fedora for Nabu with niri comp
 cp -a etc %{buildroot}/
 
 %files
-%attr(644, root, root) %config(noreplace) %{_sysconfdir}/niri/config.kdl
+%attr(644, root, root) %{_sysconfdir}/skel/.config/niri/config.kdl
 
 %post
 
 
 %changelog
-* SUn Oct 12 2025 jhuang6451 <xplayerhtz123@outlook.com> - 0.1.0-1
+* Sun Oct 12 2025 jhuang6451 <xplayerhtz123@outlook.com> - 0.1.0-1
 - Initial release.

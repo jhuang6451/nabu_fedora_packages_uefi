@@ -7,8 +7,7 @@ Summary:        A beautiful SDDM theme
 
 License:        GPL-3.0
 URL:            https://github.com/Keyitdev/sddm-astronaut-theme
-Source0:        sddm.conf
-Source1:        virtualkbd.conf
+Source0:        astronaut-theme.conf
 
 BuildRequires:  git-core
 BuildArch:      noarch
@@ -33,8 +32,7 @@ install -d %{buildroot}%{_datadir}/fonts/sddm-astronaut-theme-fonts
 cp -a %{theme_name}/Fonts/* %{buildroot}%{_datadir}/fonts/sddm-astronaut-theme-fonts/
 # 4. Install configuration files.
 install -d %{buildroot}%{_sysconfdir}/sddm.conf.d
-install -m 644 %{SOURCE0} %{buildroot}%{_sysconfdir}/sddm.conf
-install -m 644 %{SOURCE1} %{buildroot}%{_sysconfdir}/sddm.conf.d/virtualkbd.conf
+install -m 644 %{SOURCE1} %{buildroot}%{_sysconfdir}/sddm.conf.d/astronaut-theme.conf
 
 # Optional: change default theme
 sed -i 's#^ConfigFile=.*#ConfigFile=Themes/pixel_sakura.conf#' %{buildroot}%{_datadir}/sddm/themes/%{theme_name}/metadata.desktop
@@ -44,8 +42,7 @@ sed -i 's#^ConfigFile=.*#ConfigFile=Themes/pixel_sakura.conf#' %{buildroot}%{_da
 %{_datadir}/sddm/themes/%{theme_name}
 %{_datadir}/fonts/sddm-astronaut-theme-fonts
 %license %{theme_name}/LICENSE
-%{_sysconfdir}/sddm.conf
-%{_sysconfdir}/sddm.conf.d/virtualkbd.conf
+%{_sysconfdir}/sddm.conf.d/astronaut-theme.conf
 
 
 %changelog

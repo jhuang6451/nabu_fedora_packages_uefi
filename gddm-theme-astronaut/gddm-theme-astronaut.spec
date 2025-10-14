@@ -32,7 +32,7 @@ install -d %{buildroot}%{_datadir}/fonts/sddm-astronaut-theme-fonts
 cp -a %{theme_name}/Fonts/* %{buildroot}%{_datadir}/fonts/sddm-astronaut-theme-fonts/
 # 4. Install configuration files.
 install -d %{buildroot}%{_sysconfdir}/sddm.conf.d
-install -m 644 %{SOURCE1} %{buildroot}%{_sysconfdir}/sddm.conf.d/astronaut-theme.conf
+install -m 644 %{SOURCE0} %{buildroot}%{_sysconfdir}/sddm.conf.d/astronaut-theme.conf
 
 # Optional: change default theme
 sed -i 's#^ConfigFile=.*#ConfigFile=Themes/pixel_sakura.conf#' %{buildroot}%{_datadir}/sddm/themes/%{theme_name}/metadata.desktop

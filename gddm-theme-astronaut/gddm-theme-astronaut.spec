@@ -19,16 +19,19 @@ Requires:       sddm qt6-qtsvg qt6-qtvirtualkeyboard qt6-qtmultimedia
 
 %prep
 git clone -b master --depth 1 %{url} %{theme_name}
-cd %{theme_name}
 
 %build
-# No build steps needed
+# This package does not require a build step as it only consists of assets.
 
 %install
+# 1. Create the destination directory for the theme inside the buildroot.
 install -d %{buildroot}%{_datadir}/sddm/themes/%{theme_name}
-cp -a * %{buildroot}%{_datadir}/sddm/themes/%{theme_name}/
-cp -r %{buildroot}%{_datadir}/sddm/themes/%{theme_name}/Fonts/* %{_datadir}/fonts/sddm-astronaut-theme-fonts/
-
+# 2. Copy the contents of the cloned git repository into the theme directory.
+cp -a %{theme_name}/* %{buildroot}%{_datadir}/sddm/themes/%{theme_name}/
+# 3. Font installation.
+install -d %{buildroot}%{_datadir}/fonts/sddm-astronaut-theme-fonts
+cp -a %{theme_name}/Fonts/* %{buildroot}%{_datadir}/fonts/sddm-astronaut-theme-fonts/
+# 4. Install configuration files.
 install -d %{buildroot}%{_sysconfdir}/sddm.conf.d
 install -m 644 %{SOURCE0} %{buildroot}%{_sysconfdir}/sddm.conf
 install -m 644 %{SOURCE1} %{buildroot}%{_sysconfdir}/sddm.conf.d/virtualkbd.conf
@@ -39,6 +42,7 @@ sed -i 's#^ConfigFile=.*#ConfigFile=Themes/pixel_sakura.conf#' %{buildroot}%{_da
 %files
 %defattr(644, root, root, 755)
 %{_datadir}/sddm/themes/%{theme_name}
+%{_datadir}/fonts/sddm-astronaut-theme-fonts
 %license %{theme_name}/LICENSE
 %{_sysconfdir}/sddm.conf
 %{_sysconfdir}/sddm.conf.d/virtualkbd.conf

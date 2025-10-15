@@ -8,7 +8,6 @@ Summary:        Launcher-driven Bluetooth manager for Linux
 License:        GPL-3.0-or-later
 URL:            https://github.com/e-tho/bzmenu
 Source0:        %{url}/releases/download/v%{version}/%{binname}
-Source1:        %{url}/raw/v%{version}/LICENSE
 
 # Runtime dependencies
 Requires:       bluez
@@ -26,13 +25,10 @@ this spec file simply downloads a pre-built executable from github release and p
 %install
 install -d %{buildroot}%{_bindir}
 install -p -m 755 %{SOURCE0} %{buildroot}%{_bindir}/%{name}
-install -d -m 755 %{buildroot}%{_docdir}/%{name}
-install -p -m 644 %{SOURCE1} %{buildroot}%{_docdir}/%{name}/LICENSE
 
 %files
 %defattr(-,root,root,-)
 %{_bindir}/%{name}
-%license %{_docdir}/%{name}/LICENSE
 
 %changelog
 * Wed Oct 15 2025 jhuang6451 <xplayerhtz123@outlook.com> - 0.3.0-1

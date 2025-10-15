@@ -1,7 +1,7 @@
 %global debug_package %{nil}
 
 Name:           nabu-fedora-configs-niri
-Version:        0.1.1
+Version:        0.1.2
 Release:        1%{?dist}
 Summary:        Configurations for Fedora for Nabu with niri Composer
 License:        MIT
@@ -66,5 +66,5 @@ echo "Running post-install script to deploy user configs..."
 /usr/bin/deploy_configs.sh
 
 %changelog
-* Sun Oct 12 2025 jhuang6451 <xplayerhtz123@outlook.com> - 0.1.1-1
+* Sun Oct 12 2025 jhuang6451 <xplayerhtz123@outlook.com> - 0.1.2-1
 - Initial release.

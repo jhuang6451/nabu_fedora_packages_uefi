@@ -8,7 +8,7 @@ Release:        1%{?dist}
 Summary:        Launcher-driven managers for Linux by e-tho
 
 License:        GPL-3.0-or-later
-URL:            https://github.com/e-tho/
+URL:            https://github.com/e-tho
 Source0:        %{url}/bzmenu/releases/download/v%{version}/%{bz-binname}
 Source1:        %{url}/iwmenu/releases/download/v%{version}/%{iw-binname}
 Source2:        %{url}/pwmenu/releases/download/v%{version}/%{pw-binname}

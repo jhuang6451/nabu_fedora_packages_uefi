@@ -10,8 +10,6 @@ Source0:        https://github.com/jhuang6451/nabu_fedora_packages/releases/down
 BuildArch:      noarch
 BuildRequires:  systemd-rpm-macros
 
-
-
 %description
 This package contains configurations specific for Fedora for Nabu with niri composer
 

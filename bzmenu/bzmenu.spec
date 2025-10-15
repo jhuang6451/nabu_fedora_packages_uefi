@@ -26,7 +26,7 @@ bzmenu (BlueZ Menu) manages Bluetooth through your launcher of choice (like rofi
 
 %build
 # %cargo_build is provided by cargo-rpm-macros
-%cargo_build --release
+%cargo_build
 
 %install
 install -d %{buildroot}%{_bindir}

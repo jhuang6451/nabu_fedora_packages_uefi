@@ -20,30 +20,56 @@ This package contains configurations specific for Fedora for Nabu with niri comp
 # Nothing to build
 
 %install
-cp -a var %{buildroot}/
 cp -a etc %{buildroot}/
 cp -a usr %{buildroot}/
+cp -a var %{buildroot}/
 
 %files
-%attr(644, gdm, gdm) %config(noreplace) %{_sharedstatedir}/gdm/.config/monitors.xml.default
+# General Configs
 %attr(644, root, root) %config(noreplace) %{_sysconfdir}/locale.conf
 %attr(644, root, root) %config(noreplace) %{_sysconfdir}/environment.d/99-im.conf
 %attr(644, root, root) %{_prefix}/lib/systemd/system/fcitx5-autostart.service
 %attr(644, root, root) %{_presetdir}/fcitx5-autostart.preset
+# sddm Configs
+%attr(644, root, root) %config(noreplace) %{_sysconfdir}/sddm.conf.d/general.conf
+%attr(644, root, root) %config(noreplace) %{_sysconfdir}/sddm.conf.d/wayland.conf
+%attr(644, root, root) %config(noreplace) %{_sysconfdir}/sddm.conf.d/theme.conf
+# sddm Session Config Presets
+%attr(644, root, root) %config(noreplace) %{_sharedstatedir}/sddm/.config/niri/config.kdl
+# User Config Presets
+## Desktop Presets
+%attr(644, root, root) %{_sysconfdir}/skel/.local/share/applications/code-url-handler.desktop
+%attr(644, root, root) %{_sysconfdir}/skel/.local/share/applications/code.desktop
+## fuzzel
+%attr(644, root, root) %{_sysconfdir}/skel/.config/fuzzel/fuzzel.ini
+## kitty
+%attr(644, root, root) %{_sysconfdir}/skel/.config/kitty/kitty.conf
+%attr(644, root, root) %{_sysconfdir}/skel/.config/kitty/current-theme.conf
+## niri
+%attr(644, root, root) %{_sysconfdir}/skel/.config/niri/config.kdl
+## swaylock
+%attr(644, root, root) %{_sysconfdir}/skel/.config/swaylock/config
+## waybar
+%attr(644, root, root) %{_sysconfdir}/skel/.config/waybar/config.jsonc
+%attr(644, root, root) %{_sysconfdir}/skel/.config/waybar/style.css
+## waypaper
+%attr(644, root, root) %{_sysconfdir}/skel/.config/waypaper/config.ini
+%attr(644, root, root) %{_sysconfdir}/skel/.config/waypaper/style.css
+## bash
+%attr(644, root, root) %{_sysconfdir}/skel/.bashrc
+# Scripts
+%attr(755, root, root) %{_bindir}/wvkbd-toggle.sh
+%attr(755, root, root) %{_bindir}/fuzzel-pw-menu.sh
+%attr(755, root, root) %{_bindir}/niri-rotate-display.sh
+%attr(755, root, root) %{_bindir}/deploy-user-configs.sh
+# Wallpapers Dir
+%defattr(644, root, root, 755)
+%{_sysconfdir}/skel/Pictures/Wallpapers
 
 %post
-if [ ! -f %{_sharedstatedir}/gdm/.config/monitors.xml ]; then
-    install -D -p -m 644 -o gdm -g gdm %{_sharedstatedir}/gdm/.config/monitors.xml.default %{_sharedstatedir}/gdm/.config/monitors.xml
-fi
-
-%systemd_post fcitx5-autostart.service
-
-%preun
-%systemd_preun fcitx5-autostart.service
-
-%postun
-%systemd_postun_with_restart fcitx5-autostart.service
+echo "Running post-install script to deploy user configs..."
+/usr/bin/deploy_configs.sh
 
 %changelog
-* SUn Oct 12 2025 jhuang6451 <xplayerhtz123@outlook.com> - 0.1.0-1
+* Sun Oct 12 2025 jhuang6451 <xplayerhtz123@outlook.com> - 0.1.0-1
 - Initial release.

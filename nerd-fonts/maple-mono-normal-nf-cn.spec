@@ -3,17 +3,19 @@
 Name:           maple-mono-normal-nf-cn
 Version:        7.7
 Release:        1%{?dist}
-Summary:        Maple Mono font full CN, unhinted version with "--normal" preset
+Summary:        Maple Mono nerd font normal version (unhinted, full CN)
 BuildArch:      noarch
 License:        OFL-1.1
 URL:            https://github.com/subframe7536/maple-font
 Source0:        %{url}/releases/download/v%{version}/MapleMonoNormal-NF-CN-unhinted.zip
 
+Conflicts:      maple-mono-normal-nf
+
 Requires(post):   fontconfig
 Requires(postun): fontconfig
 
 %description
-Maple Mono font full CN, unhinted version with "--normal" preset.
+%{summary}
 
 %prep
 %autosetup -c

@@ -1,7 +1,7 @@
 %global debug_package %{nil}
 
 Name:           nabu-fedora-configs-niri
-Version:        0.1.1
+Version:        0.1.2
 Release:        1%{?dist}
 Summary:        Configurations for Fedora for Nabu with niri Composer
 License:        MIT
@@ -55,8 +55,6 @@ cp -a var %{buildroot}/
 ## waypaper
 %attr(644, root, root) %{_sysconfdir}/skel/.config/waypaper/config.ini
 %attr(644, root, root) %{_sysconfdir}/skel/.config/waypaper/style.css
-## bash
-%attr(644, root, root) %{_sysconfdir}/skel/.bashrc
 # Scripts
 %attr(755, root, root) %{_bindir}/wvkbd-toggle.sh
 %attr(755, root, root) %{_bindir}/fuzzel-pw-menu.sh
@@ -70,6 +68,18 @@ cp -a var %{buildroot}/
 echo "Running post-install script to deploy user configs..."
 /usr/bin/deploy_configs.sh
 
+## bash
+if [ -f /etc/skel/.bashrc ]; then
+    echo "Appending custom configurations to /etc/skel/.bashrc"
+    cat << 'EOF' >> /etc/skel/.bashrc
+
+# ---- Added by nabu-fedora-configs-niri ----
+alias code='code --ozone-platform=wayland'
+fastfetch
+# ---- End of nabu-fedora-configs-niri section ----
+EOF
+fi
+
 %changelog
-* Sun Oct 12 2025 jhuang6451 <xplayerhtz123@outlook.com> - 0.1.1-1
+* Sun Oct 12 2025 jhuang6451 <xplayerhtz123@outlook.com> - 0.1.2-1
 - Initial release.

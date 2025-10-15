@@ -49,7 +49,7 @@
     // "format-icons": {
     //   "active": " 󱗜 "
     // },
-    "sort-by-number": true,
+    "sort-by-number": true
     // "persistent-workspaces": {
     //   "*": 8, // 5 workspaces by default on every monitor
     //   "HDMI-A-1": 5 // but only three on HDMI-A-1

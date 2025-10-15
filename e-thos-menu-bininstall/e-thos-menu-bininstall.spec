@@ -13,7 +13,6 @@ Source0:        %{url}/bzmenu/releases/download/v%{version}/%{bz-binname}
 Source1:        %{url}/iwmenu/releases/download/v%{version}/%{iw-binname}
 Source2:        %{url}/pwmenu/releases/download/v%{version}/%{pw-binname}
 
-
 # Runtime dependencies
 Requires:       bluez
 Requires:       iwd

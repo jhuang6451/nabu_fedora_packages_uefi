@@ -36,7 +36,7 @@ fi
 %files
 %defattr(644, root, root, 755)
 /usr/share/fonts/%{name}
-%license LICENSE.md
+%license LICENSE
 
 %changelog
 * Wed Oct 15 2025 jhuang6451 <xplayerhtz123@outlook.com> - 3.4.0-1

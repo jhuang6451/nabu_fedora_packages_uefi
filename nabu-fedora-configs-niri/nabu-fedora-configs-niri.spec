@@ -1,7 +1,7 @@
 %global debug_package %{nil}
 
 Name:           nabu-fedora-configs-niri
-Version:        0.1.3
+Version:        0.1.4
 Release:        1%{?dist}
 Summary:        Configurations for Fedora for Nabu with niri Composer
 License:        MIT
@@ -55,16 +55,21 @@ cp -a var %{buildroot}/
 ## waypaper
 %attr(644, root, root) %{_sysconfdir}/skel/.config/waypaper/config.ini
 %attr(644, root, root) %{_sysconfdir}/skel/.config/waypaper/style.css
+## bash
+%attr(644, root, root) %{_sysconfdir}/skel/.bashrc
 # Scripts
 %attr(755, root, root) %{_bindir}/wvkbd-toggle.sh
 %attr(755, root, root) %{_bindir}/fuzzel-pw-menu.sh
 %attr(755, root, root) %{_bindir}/niri-rotate-display.sh
 %attr(755, root, root) %{_bindir}/deploy-user-configs.sh
+# Wallpapers Dir
+%defattr(644, root, root, 755)
+%{_sysconfdir}/skel/Pictures/Wallpapers
 
 %post
 echo "Running post-install script to deploy user configs..."
 /usr/bin/deploy_configs.sh
 
 %changelog
-* Sun Oct 12 2025 jhuang6451 <xplayerhtz123@outlook.com> - 0.1.3-1
+* Sun Oct 12 2025 jhuang6451 <xplayerhtz123@outlook.com> - 0.1.4-1
 - Initial release.

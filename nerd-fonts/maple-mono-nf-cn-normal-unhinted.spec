@@ -1,6 +1,6 @@
 %global debug_package %{nil}
 
-Name:           maple-mono-nf-cn-normal-unhinted
+Name:           maple-mono-normal-nf-cn
 Version:        7.7
 Release:        1%{?dist}
 Summary:        Maple Mono font full CN, unhinted version with "--normal" preset
@@ -19,7 +19,7 @@ Maple Mono font full CN, unhinted version with "--normal" preset.
 %autosetup -c
 
 %build
-# 无需构建
+# Nothing to build.
 
 %install
 mkdir -p %{buildroot}/usr/share/fonts/%{name}

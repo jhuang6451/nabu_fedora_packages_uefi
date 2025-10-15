@@ -1,6 +1,6 @@
-%define bz-binname bzmenu-%{_arch}-linux-gnu
-%define iw-binname iwmenu-%{_arch}-linux-gnu
-%define pw-binname pwmenu-%{_arch}-linux-gnu
+%global bz_binname bzmenu-%{_arch}-linux-gnu
+%global iw_binname iwmenu-%{_arch}-linux-gnu
+%global pw_binname pwmenu-%{_arch}-linux-gnu
 
 Name:           e-thos-menu
 Version:        0.3.0
@@ -9,9 +9,9 @@ Summary:        Launcher-driven managers for Linux by e-tho
 
 License:        GPL-3.0-or-later
 URL:            https://github.com/e-tho
-Source0:        %{url}/bzmenu/releases/download/v%{version}/%{bz-binname}
-Source1:        %{url}/iwmenu/releases/download/v%{version}/%{iw-binname}
-Source2:        %{url}/pwmenu/releases/download/v%{version}/%{pw-binname}
+Source0:        %{url}/bzmenu/releases/download/v%{version}/%{bz_binname}
+Source1:        %{url}/iwmenu/releases/download/v%{version}/%{iw_binname}
+Source2:        %{url}/pwmenu/releases/download/v%{version}/%{pw_binname}
 
 # Runtime dependencies
 Requires:       bluez

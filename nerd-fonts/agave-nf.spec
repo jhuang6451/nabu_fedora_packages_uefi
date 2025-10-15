@@ -7,7 +7,7 @@ Summary:        Agave Nerd Fonts
 BuildArch:      noarch
 License:        MIT
 URL:            https://github.com/ryanoasis/nerd-fonts
-Source0:        %{url}/releases/download/v${version}/Agave.tar.xz
+Source0:        %{url}/releases/download/v%{version}/Agave.tar.xz
 
 Requires(post):   fontconfig
 Requires(postun): fontconfig

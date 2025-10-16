@@ -1,7 +1,7 @@
 %global debug_package %{nil}
 
 Name:           nabu-fedora-configs-niri
-Version:        0.1.3
+Version:        0.1.4
 Release:        1%{?dist}
 Summary:        Configurations for Fedora for Nabu with niri Composer
 License:        MIT
@@ -28,7 +28,7 @@ cp -a var %{buildroot}/
 # General Configs
 %attr(644, root, root) %config(noreplace) %{_sysconfdir}/locale.conf
 %attr(644, root, root) %config(noreplace) %{_sysconfdir}/environment.d/99-im.conf
-%attr(644, root, root) %{_prefix}/lib/systemd/system/fcitx5-autostart.service
+%attr(644, root, root) %{_prefix}/lib/systemd/system/91-fcitx5-autostart.service
 %attr(644, root, root) %{_presetdir}/fcitx5-autostart.preset
 # sddm Configs
 %attr(644, root, root) %config(noreplace) %{_sysconfdir}/sddm.conf.d/general.conf
@@ -81,6 +81,9 @@ EOF
 fi
 
 %changelog
+* Thu Oct 16 2025 jhuang6451 <xplayerhtz123@outlook.com> - 0.1.4-1
+- Fix fcitx5-autostart systemd preset name.
+
 * Thu Oct 16 2025 jhuang6451 <xplayerhtz123@outlook.com> - 0.1.3-1
 - Postinstall script and some config updates.
 

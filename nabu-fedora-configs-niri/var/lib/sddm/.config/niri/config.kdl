@@ -92,7 +92,7 @@ output "DSI-1" {
 
     // Transform allows to rotate the output counter-clockwise, valid values are:
     // normal, 90, 180, 270, flipped, flipped-90, flipped-180 and flipped-270.
-    transform "normal"
+    transform "270"
 
     // Position of the output in the global coordinate space.
     // This affects directional monitor actions like "focus-monitor-left", and cursor movement.

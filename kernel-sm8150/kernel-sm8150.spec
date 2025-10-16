@@ -1,7 +1,7 @@
 %undefine        _debugsource_packages
 %global tag      6.16
 Version:         6.16.0
-Release:         1.sm8150%{?dist}
+Release:         7.sm8150%{?dist}
 ExclusiveArch:   aarch64
 Name:            kernel-sm8150
 Summary:         Mainline Linux kernel for sm8150 devices
@@ -10,7 +10,7 @@ URL:             https://gitlab.com/sm8150-mainline/linux
 Source0:         %{url}/-/archive/sm8150/%{tag}/linux-sm8150-%{tag}.tar.gz
 Source1:         extra-sm8150.config
 Patch0:          0001-dts-nabu-add-panel-rotation-property.patch
-
+Patch1:          0002-dtsi-nabu-add-display-reset.patch
 
 BuildRequires:   bc bison dwarves diffutils elfutils-devel findutils gcc gcc-c++ git-core hmaccalc hostname make openssl-devel perl-interpreter rsync tar which flex bzip2 xz zstd python3 python3-devel python3-pyyaml rust rust-src bindgen rustfmt clippy opencsd-devel net-tools dracut
 
@@ -137,6 +137,9 @@ if [ "$1" -eq 0 ] ; then
 fi
 
 %changelog
+* Fri Oct 17 2025 jhuang6451 <xplayerhtz123@outlook.com> - 6.16.0-7.sm8150
+- Add Add display reset patch to dtsi.
+
 * Mon Oct 13 2025 jhuang6451 <xplayerhtz123@outlook.com> - 6.16.0-6.sm8150
 - Add screen rotation property patch to dts.
 

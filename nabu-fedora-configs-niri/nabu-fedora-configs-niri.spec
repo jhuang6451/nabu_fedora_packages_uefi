@@ -1,7 +1,7 @@
 %global debug_package %{nil}
 
 Name:           nabu-fedora-configs-niri
-Version:        0.1.6
+Version:        0.1.7
 Release:        1%{?dist}
 Summary:        Configurations for Fedora for Nabu with niri Composer
 License:        MIT
@@ -9,6 +9,9 @@ URL:            https://github.com/jhuang6451/nabu_fedora
 Source0:        https://github.com/jhuang6451/nabu_fedora_packages/releases/download/%{name}-%{version}/%{name}-%{version}.tar.gz
 BuildArch:      noarch
 BuildRequires:  systemd-rpm-macros
+
+Requires:       pipewire-pulse
+Requires:       wireplumber
 
 %description
 This package contains configurations specific for Fedora for Nabu with niri composer
@@ -76,7 +79,48 @@ fastfetch
 EOF
 fi
 
+# ----------------------------------------------------------------------
+# pipewire user services
+#
+# This script handles the systemd user services for PipeWire.
+# We use 'systemctl --global' to enable/disable services for all
+# users on the system.
+#
+# The changes will take effect for each user upon their next login.
+# ----------------------------------------------------------------------
+
+# 1. Mask the legacy pulseaudio services to prevent conflicts.
+#    This ensures that pipewire-pulse can take over without issues.
+#    The '|| :' part ensures the command doesn't fail if the service
+#    doesn't exist on the system.
+echo "Masking conflicting PulseAudio user services for all users..."
+systemctl --global mask pulseaudio.service pulseaudio.socket || :
+
+# 2. Enable the core PipeWire services for all users.
+echo "Enabling PipeWire user services for all users..."
+systemctl --global enable pipewire.service pipewire-pulse.service wireplumber.service || :
+
+
+%postun
+# ----------------------------------------------------------------------
+# Post-uninstall script
+#
+# This runs if the package is being uninstalled (not upgraded).
+# The '$1' argument is 0 on final removal, and >= 1 on upgrade.
+# ----------------------------------------------------------------------
+if [ $1 -eq 0 ] ; then
+    # This is a final uninstall, not an upgrade.
+    echo "Disabling PipeWire user services for all users..."
+    systemctl --global disable pipewire.service pipepipe-pulse.service wireplumber.service || :
+
+    echo "Unmasking PulseAudio user services for all users..."
+    systemctl --global unmask pulseaudio.service pulseaudio.socket || :
+fi
+
 %changelog
+* Thu Oct 16 2025 jhuang6451 <xplayerhtz123@outlook.com> - 0.1.7-1
+- Add postinstall script for pipwire user services.
+
 * Thu Oct 16 2025 jhuang6451 <xplayerhtz123@outlook.com> - 0.1.6-1
 - Remove deploy_user_configs.sh.
 

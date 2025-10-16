@@ -1,7 +1,7 @@
 %global debug_package %{nil}
 
 Name:           nabu-fedora-configs-niri
-Version:        0.1.4
+Version:        0.1.5
 Release:        1%{?dist}
 Summary:        Configurations for Fedora for Nabu with niri Composer
 License:        MIT
@@ -59,15 +59,11 @@ cp -a var %{buildroot}/
 %attr(755, root, root) %{_bindir}/wvkbd-toggle.sh
 %attr(755, root, root) %{_bindir}/fuzzel-pw-menu.sh
 %attr(755, root, root) %{_bindir}/niri-rotate-display.sh
-%attr(755, root, root) %{_bindir}/deploy-user-configs.sh
 # Wallpapers Dir
 %defattr(644, root, root, 755)
 %{_sysconfdir}/skel/Pictures/Wallpapers
 
 %post
-echo "Running post-install script to deploy user configs..."
-/usr/bin/deploy_configs.sh
-
 ## bash
 if [ -f /etc/skel/.bashrc ]; then
     echo "Appending custom configurations to /etc/skel/.bashrc"
@@ -81,6 +77,9 @@ EOF
 fi
 
 %changelog
+* Thu Oct 16 2025 jhuang6451 <xplayerhtz123@outlook.com> - 0.1.5-1
+- Remove deploy_user_configs.sh.
+
 * Thu Oct 16 2025 jhuang6451 <xplayerhtz123@outlook.com> - 0.1.4-1
 - Fix fcitx5-autostart systemd preset name.
 

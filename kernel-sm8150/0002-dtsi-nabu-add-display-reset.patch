@@ -2,9 +2,6 @@ From: jhuang6451 <xplayerhtz123@outlook.com>
 Date: Fri, 17 Oct 2025 00:44:15 +0000
 Subject: [PATCH] dtsi: qcom: sm8150: nabu: Add display reset
 
----
- arch/arm64/boot/dts/qcom/sm8150-xiaomi-nabu.dts | 1 +
- 1 file changed, 1 insertion(+)
 --- a/arch/arm64/boot/dts/qcom/sm8150.dtsi
 +++ b/arch/arm64/boot/dts/qcom/sm8150.dtsi
 @@ -3833,6 +3833,8 @@

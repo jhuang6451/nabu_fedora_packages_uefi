@@ -1,7 +1,7 @@
 %global debug_package %{nil}
 
 Name:           nabu-fedora-configs-niri
-Version:        0.1.5
+Version:        0.1.6
 Release:        1%{?dist}
 Summary:        Configurations for Fedora for Nabu with niri Composer
 License:        MIT
@@ -28,8 +28,8 @@ cp -a var %{buildroot}/
 # General Configs
 %attr(644, root, root) %config(noreplace) %{_sysconfdir}/locale.conf
 %attr(644, root, root) %config(noreplace) %{_sysconfdir}/environment.d/99-im.conf
-%attr(644, root, root) %{_prefix}/lib/systemd/system/91-fcitx5-autostart.service
-%attr(644, root, root) %{_presetdir}/fcitx5-autostart.preset
+%attr(644, root, root) %{_prefix}/lib/systemd/system/fcitx5-autostart.service
+%attr(644, root, root) %{_presetdir}/91-fcitx5-autostart.preset
 # sddm Configs
 %attr(644, root, root) %config(noreplace) %{_sysconfdir}/sddm.conf.d/general.conf
 %attr(644, root, root) %config(noreplace) %{_sysconfdir}/sddm.conf.d/wayland.conf
@@ -77,7 +77,7 @@ EOF
 fi
 
 %changelog
-* Thu Oct 16 2025 jhuang6451 <xplayerhtz123@outlook.com> - 0.1.5-1
+* Thu Oct 16 2025 jhuang6451 <xplayerhtz123@outlook.com> - 0.1.6-1
 - Remove deploy_user_configs.sh.
 
 * Thu Oct 16 2025 jhuang6451 <xplayerhtz123@outlook.com> - 0.1.4-1

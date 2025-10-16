@@ -1,7 +1,7 @@
 %global debug_package %{nil}
 
 Name:           nabu-fedora-configs-gnome
-Version:        0.4.6
+Version:        0.4.7
 Release:        1%{?dist}
 Summary:        Configurations for Fedora for Nabu with Gnome DE
 License:        MIT
@@ -28,8 +28,8 @@ cp -a usr %{buildroot}/
 %attr(644, gdm, gdm) %config(noreplace) %{_sharedstatedir}/gdm/.config/monitors.xml.default
 %attr(644, root, root) %config(noreplace) %{_sysconfdir}/locale.conf
 %attr(644, root, root) %config(noreplace) %{_sysconfdir}/environment.d/99-im.conf
-%attr(644, root, root) %{_prefix}/lib/systemd/system/91-fcitx5-autostart.service
-%attr(644, root, root) %{_presetdir}/fcitx5-autostart.preset
+%attr(644, root, root) %{_prefix}/lib/systemd/system/fcitx5-autostart.service
+%attr(644, root, root) %{_presetdir}/91-fcitx5-autostart.preset
 
 %post
 if [ ! -f %{_sharedstatedir}/gdm/.config/monitors.xml ]; then
@@ -45,7 +45,7 @@ fi
 %systemd_postun_with_restart fcitx5-autostart.service
 
 %changelog
-* Thu Oct 16 2025 jhuang6451 <xplayerhtz123@outlook.com> - 0.4.6-1
+* Thu Oct 16 2025 jhuang6451 <xplayerhtz123@outlook.com> - 0.4.7-1
 - Fix fcitx5-autostart systemd preset name.
 
 * Fri Oct 10 2025 jhuang6451 <xplayerhtz123@outlook.com> - 0.4.5-1

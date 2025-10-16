@@ -1,7 +1,7 @@
 %global debug_package %{nil}
 
 Name:           nabu-fedora-configs-niri
-Version:        0.1.9
+Version:        0.1.10
 Release:        1%{?dist}
 Summary:        Configurations for Fedora for Nabu with niri Composer
 License:        MIT
@@ -10,7 +10,7 @@ Source0:        https://github.com/jhuang6451/nabu_fedora_packages/releases/down
 BuildArch:      noarch
 BuildRequires:  systemd-rpm-macros
 
-Requires:       pipewire-alsa
+Requires:       pipewire-pulseaudio
 Requires:       wireplumber
 
 %description
@@ -118,7 +118,7 @@ if [ $1 -eq 0 ] ; then
 fi
 
 %changelog
-* Thu Oct 16 2025 jhuang6451 <xplayerhtz123@outlook.com> - 0.1.9-1
+* Thu Oct 16 2025 jhuang6451 <xplayerhtz123@outlook.com> - 0.1.10-1
 - Add postinstall script for pipwire user services.
 
 * Thu Oct 16 2025 jhuang6451 <xplayerhtz123@outlook.com> - 0.1.6-1

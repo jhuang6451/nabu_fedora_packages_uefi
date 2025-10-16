@@ -1,7 +1,7 @@
 %global debug_package %{nil}
 
 Name:           nabu-fedora-configs-niri
-Version:        0.1.7
+Version:        0.1.8
 Release:        1%{?dist}
 Summary:        Configurations for Fedora for Nabu with niri Composer
 License:        MIT
@@ -111,7 +111,7 @@ systemctl --global enable pipewire.service pipewire-pulse.service wireplumber.se
 if [ $1 -eq 0 ] ; then
     # This is a final uninstall, not an upgrade.
     echo "Disabling PipeWire user services for all users..."
-    systemctl --global disable pipewire.service pipepipe-pulse.service wireplumber.service || :
+    systemctl --global disable pipewire.service pipewire-pulse.service wireplumber.service || :
 
     echo "Unmasking PulseAudio user services for all users..."
     systemctl --global unmask pulseaudio.service pulseaudio.socket || :

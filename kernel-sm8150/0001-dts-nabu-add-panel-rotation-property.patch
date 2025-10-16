@@ -7,6 +7,10 @@ intended default usage is landscape. Add the rotation property
 to correct the display orientation in early boot stages like
 the framebuffer console.
 
+---
+ arch/arm64/boot/dts/qcom/sm8150-xiaomi-nabu.dts | 1 +
+ 1 file changed, 1 insertion(+)
+
 --- a/arch/arm64/boot/dts/qcom/sm8150-xiaomi-nabu.dts
 +++ b/arch/arm64/boot/dts/qcom/sm8150-xiaomi-nabu.dts
 @@ -614,6 +614,7 @@ display_panel: panel@0 {

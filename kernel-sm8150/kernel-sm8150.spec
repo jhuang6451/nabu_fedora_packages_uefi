@@ -23,7 +23,7 @@ Provides:        kernel-modules-core  = %{version}-%{release}
 Mainline kernel for sm8150 (Qualcomm Snapdragon 855/860) devices, packaged for standard Fedora systems with UEFI boot support
 
 %prep
-%autosetup -p1 -n linux-sm8150-%{tag}
+%autosetup -p1 -n kernel-sm8150-%{tag}
 
 # 准备默认配置
 make defconfig sm8150.config

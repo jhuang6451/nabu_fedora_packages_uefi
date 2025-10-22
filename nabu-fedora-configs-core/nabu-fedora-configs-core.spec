@@ -1,7 +1,7 @@
 %global debug_package %{nil}
 
 Name:           nabu-fedora-configs-core
-Version:        0.5.7
+Version:        0.5.8
 Release:        1%{?dist}
 Summary:        Core configuration files for Fedora on Xiaomi Pad 5 (nabu)
 License:        MIT
@@ -43,10 +43,12 @@ tar -xf fedora-mac-style.tar.xz -C %{buildroot}%{_datadir}/plymouth/themes/fedor
 %attr(644, root, root) %config(noreplace) %{_sysconfdir}/fstab
 %attr(644, root, root) %config(noreplace) %{_sysconfdir}/systemd/ukify.conf
 %attr(644, root, root) %config(noreplace) %{_sysconfdir}/systemd/zram-generator.conf
+%attr(644, root, root) %config(noreplace) %{_sysconfdir}/NetworkManager/conf.d/10-iwd.conf
 %attr(644, root, root) %{_prefix}/lib/systemd/system/ath10k-shutdown.service
 %attr(644, root, root) %{_prefix}/lib/udev/rules.d/99-force-rtc1.rules
 %attr(644, root, root) %{_presetdir}/80-nabu-core.preset
 %attr(644, root, root) %{_presetdir}/81-qbootctl.preset
+%attr(644, root, root) %{_presetdir}/82-disable-wpa_supplicant.preset
 %attr(644, root, root) %{_datadir}/alsa/ucm2/conf.d/sm8150/sm8150.conf
 %attr(644, root, root) %{_datadir}/alsa/ucm2/Xiaomi/nabu/HiFi.conf
 %attr(644, root, root) %config(noreplace) %{_sysconfdir}/pulse/daemon.conf.d/89-xiaomi_nabu.conf
@@ -75,7 +77,7 @@ echo "--- UKI regeneration process finished. ---"
 %systemd_postun_with_restart ath10k-shutdown.service
 
 %changelog
-* Wed Oct 22 2025 jhuang6451 <xplayerhtz123@outlook.com> - 0.5.7-1
+* Wed Oct 22 2025 jhuang6451 <xplayerhtz123@outlook.com> - 0.5.8-1
 - Change WLAN backend to iwd.
 
 * Fri Oct 10 2025 jhuang6451 <xplayerhtz123@outlook.com> - 0.5.5-1

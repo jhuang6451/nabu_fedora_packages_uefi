@@ -1,7 +1,7 @@
 %global debug_package %{nil}
 
 Name:           nabu-fedora-configs-core
-Version:        0.5.6
+Version:        0.5.7
 Release:        1%{?dist}
 Summary:        Core configuration files for Fedora on Xiaomi Pad 5 (nabu)
 License:        MIT
@@ -75,6 +75,9 @@ echo "--- UKI regeneration process finished. ---"
 %systemd_postun_with_restart ath10k-shutdown.service
 
 %changelog
+* Wed Oct 22 2025 jhuang6451 <xplayerhtz123@outlook.com> - 0.5.7-1
+- Change WLAN backend to iwd.
+
 * Fri Oct 10 2025 jhuang6451 <xplayerhtz123@outlook.com> - 0.5.5-1
 - Force check dtb when regenerate UKI.
 

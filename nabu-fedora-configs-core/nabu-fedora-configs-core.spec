@@ -1,7 +1,7 @@
 %global debug_package %{nil}
 
 Name:           nabu-fedora-configs-core
-Version:        0.5.8
+Version:        0.5.9
 Release:        1%{?dist}
 Summary:        Core configuration files for Fedora on Xiaomi Pad 5 (nabu)
 License:        MIT
@@ -19,6 +19,7 @@ Requires:       qbootctl
 Requires:       plymouth
 Requires:       plymouth-plugin-script
 Requires:       plymouth-plugin-two-step
+Requires:       iwd
 
 %description
 This package contains the essential configuration files for running Fedora on the Xiaomi Pad 5 (nabu)
@@ -77,7 +78,7 @@ echo "--- UKI regeneration process finished. ---"
 %systemd_postun_with_restart ath10k-shutdown.service
 
 %changelog
-* Wed Oct 22 2025 jhuang6451 <xplayerhtz123@outlook.com> - 0.5.8-1
+* Wed Oct 22 2025 jhuang6451 <xplayerhtz123@outlook.com> - 0.5.9-1
 - Change WLAN backend to iwd.
 
 * Fri Oct 10 2025 jhuang6451 <xplayerhtz123@outlook.com> - 0.5.5-1

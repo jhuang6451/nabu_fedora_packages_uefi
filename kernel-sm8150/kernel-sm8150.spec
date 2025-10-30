@@ -1,6 +1,6 @@
 %undefine        _debugsource_packages
 %global tag      6.13
-Version:         6.13
+Version:         6.13.0
 Release:         1.nabu%{?dist}
 ExclusiveArch:   aarch64
 Name:            kernel-sm8150

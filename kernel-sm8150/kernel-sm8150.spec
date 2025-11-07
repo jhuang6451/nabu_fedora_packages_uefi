@@ -1,7 +1,7 @@
 %undefine        _debugsource_packages
 %global tag      6.17
 Version:         6.17.0
-Release:         1.nabu%{?dist}
+Release:         1.nextworks%{?dist}
 ExclusiveArch:   aarch64
 Name:            kernel-sm8150
 Summary:         Mainline Linux kernel for xiaomi-nabu

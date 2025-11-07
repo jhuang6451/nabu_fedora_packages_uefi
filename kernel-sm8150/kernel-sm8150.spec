@@ -23,7 +23,7 @@ Provides:        kernel-modules-core  = %{version}-%{release}
 Mainline kernel for xiaomi-nabu (Qualcomm Snapdragon 855/860), packaged for standard Fedora systems with UEFI boot support
 
 %prep
-%autosetup -p1 -n linux-main
+%autosetup -p1 -n linux
 
 # 准备默认配置
 make defconfig sm8150.config
